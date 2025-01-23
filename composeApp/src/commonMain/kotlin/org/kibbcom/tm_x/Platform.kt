@@ -1,4 +1,4 @@
-package org.kibbcom.helloworld
+package org.kibbcom.tm_x
 
 interface Platform {
     val name: String

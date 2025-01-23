@@ -1,4 +1,4 @@
-rootProject.name = "HelloWorld"
+rootProject.name = "TM-X"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {

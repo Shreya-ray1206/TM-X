@@ -1,4 +1,4 @@
-package org.kibbcom.helloworld
+package org.kibbcom.tm_x
 
 class Greeting {
     private val platform = getPlatform()

@@ -1,4 +1,4 @@
-package org.kibbcom.helloworld
+package org.kibbcom.tm_x
 
 class JVMPlatform: Platform {
     override val name: String = "Java ${System.getProperty("java.version")}"
