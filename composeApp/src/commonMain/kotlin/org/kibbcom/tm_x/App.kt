@@ -36,6 +36,9 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
@@ -47,15 +50,6 @@ import androidx.compose.ui.unit.sp
 @Composable
 @Preview
 fun App(navigationState: NavigationState = remember { NavigationState() } ) {
-//    MaterialTheme {
-//        Column(
-//            modifier = Modifier.fillMaxSize()
-//        ) {
-//            Header()
-//            Content()
-////            Footer()
-//        }
-//    }
     Scaffold (
         topBar = {
             TopAppBar(
@@ -70,7 +64,7 @@ fun App(navigationState: NavigationState = remember { NavigationState() } ) {
         bottomBar = { Footer(navigationState) }
     ){
             innerPadding ->
-//        Navigation(navigationState, Modifier.padding(innerPadding))
+        Navigation(navigationState, Modifier.padding(innerPadding))
     }
 
 }
@@ -93,10 +87,15 @@ fun Footer(navigationState: NavigationState){
     val items = listOf(Screen.Device, Screen.Beacon)
     val selectedItem = navigationState.currentScreen
 
-    BottomNavigation() {
+    BottomNavigation {
         items.forEach { screen ->
             BottomNavigationItem(
-                icon = { Icon(Icons.Default.Add, contentDescription = screen.toString()) },
+                icon = {
+                    when (screen) {
+                        is Screen.Device -> Icon(Icons.Default.Home, contentDescription = screen.toString())
+                        is Screen.Beacon -> Icon(Icons.Default.LocationOn, contentDescription = screen.toString())
+                    }
+                },
                 label = { Text(screen.toString()) },
                 selected = selectedItem == screen,
                 onClick = { navigationState.navigateTo(screen) }
@@ -104,6 +103,37 @@ fun Footer(navigationState: NavigationState){
         }
     }
 
+}
+
+@Composable
+fun Navigation(navigationState: NavigationState, modifier: Modifier = Modifier) {
+    when (navigationState.currentScreen) {
+        is Screen.Device -> DeviceScreen()
+        is Screen.Beacon -> BeaconScreen()
+    }
+}
+
+@Composable
+fun DeviceScreen() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Header()
+        Content()
+    }
+}
+
+
+@Composable
+fun BeaconScreen() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text("Beacon Screen", fontSize = 24.sp)
+    }
 }
 
 @Composable
@@ -195,11 +225,43 @@ fun DeviceGrid() {
         ),
         Device(
             id = "4",
-            name = "Device 4",
+            name = "Shreya Tm-x 4",
             infoLine1 = "Info Line 1",
             infoLine2 = "Info Line 2",
             isAuthenticated = true,
             isConnected = true
+        ),
+        Device(
+            id = "5",
+            name = "Device 5",
+            infoLine1 = "Info Line 1",
+            infoLine2 = "Info Line 2",
+            isAuthenticated = true,
+            isConnected = false
+        ),
+        Device(
+            id = "6",
+            name = "Device 6",
+            infoLine1 = "Info Line 1",
+            infoLine2 = "Info Line 2",
+            isAuthenticated = true,
+            isConnected = false
+        ),
+        Device(
+            id = "7",
+            name = "Device 5",
+            infoLine1 = "Info Line 1",
+            infoLine2 = "Info Line 2",
+            isAuthenticated = true,
+            isConnected = false
+        ),
+        Device(
+            id = "8",
+            name = "Device 6",
+            infoLine1 = "Info Line 1",
+            infoLine2 = "Info Line 2",
+            isAuthenticated = true,
+            isConnected = false
         )
     )
 
