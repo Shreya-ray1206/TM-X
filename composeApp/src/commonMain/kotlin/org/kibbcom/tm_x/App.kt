@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 
 import androidx.compose.foundation.layout.Row
 
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -33,7 +35,9 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.BottomAppBar
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.ButtonDefaults
@@ -43,6 +47,7 @@ import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Phone
@@ -59,7 +64,7 @@ private val LightColorPalette = lightColors(
     primary = Color.Black, // Black for TopBar and BottomBar
     primaryVariant = Color(0xFF333333), // Darker black for variations
     secondary = Color(0xFF03A9F4), // Light blue for secondary elements
-    background = Color.Black, // Dark gray background
+    background = Color(0xFF353535), // Dark gray background
     surface = Color(0xFFF5F5F5).copy(alpha = 0.2f), // Transparent surface for cards
     onPrimary = Color.White, // White text on primary (black)
     onSecondary = Color.Black, // Black text on secondary
@@ -91,15 +96,27 @@ fun App(navigationState: NavigationState = remember { NavigationState() }) {
                     title = {
                         Text("Kibbcom TM-X", color = MaterialTheme.colors.onPrimary)
                     },
-                    backgroundColor = MaterialTheme.colors.primary, // Black
+                    backgroundColor = Color(0xFF373737), // Black
                     actions = {
                         DeviceStatusIndicator(isConnected = true)
                     }
                 )
             },
-            bottomBar = { Footer(navigationState) }
-        ) { innerPadding ->
-            Navigation(navigationState, Modifier.padding(innerPadding))
+            bottomBar = {
+                BottomAppBar(
+                    backgroundColor =  Color(0xFF373737),
+                    contentColor = MaterialTheme.colors.onPrimary // White icons
+                ) {
+                    // Bottom bar content (e.g., navigation icons)
+                    Footer(navigationState)
+                }
+            }
+        ) {
+                innerPadding ->
+            Navigation(
+                navigationState,
+                Modifier.padding(innerPadding)
+            )
         }
     }
 }
@@ -110,12 +127,12 @@ fun App(navigationState: NavigationState = remember { NavigationState() }) {
 fun DeviceStatusIndicator(isConnected: Boolean) {
     val color = if (isConnected) Color(0xFF88D66C) else Color.Gray
 
-    Box(
-        modifier = Modifier
-            .size(24.dp)
-            .clip(shape = CircleShape)
-            .background(color)
-    ) {}
+    Icon(
+        imageVector = Icons.Default.Check,
+        contentDescription = "Connection Status", // Provide a meaningful description
+        tint = color, // Apply the conditional color here
+        modifier = Modifier.size(24.dp) // Set the size of the icon
+    )
 }
 
 @Composable
@@ -124,7 +141,7 @@ fun Footer(navigationState: NavigationState){
     val selectedItem = navigationState.currentScreen
 
     BottomNavigation(
-        backgroundColor = MaterialTheme.colors.primary
+        backgroundColor = Color(0xFF373737)
     ) {
         items.forEach { screen ->
             BottomNavigationItem(
@@ -136,8 +153,10 @@ fun Footer(navigationState: NavigationState){
                 },
                 label = { Text(screen.toString()) },
                 selected = selectedItem == screen,
-                onClick = { navigationState.navigateTo(screen) }
-            )
+                onClick = { navigationState.navigateTo(screen) },
+                selectedContentColor = MaterialTheme.colors.secondary,
+                unselectedContentColor = Color.White
+                )
         }
     }
 
@@ -150,38 +169,27 @@ fun Navigation(navigationState: NavigationState, modifier: Modifier = Modifier) 
         is Screen.Beacon -> BeaconScreen()
     }
 }
-
-@Composable
-fun DeviceScreen(
-
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-
-    ) {
-        // Add Header first
-        Header()
-
-        // Add Spacer if necessary to give space for the content
-        Spacer(modifier = Modifier.height(16.dp)) // Optional spacing
-
-        // Then add Content
-        Content()
-    }
-}
-
-
-@Composable
-fun BeaconScreen() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text("Beacon Screen", fontSize = 24.sp)
-    }
-}
+//
+//@Composable
+//fun DeviceScreen(
+//
+//) {
+//    Column(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .padding(16.dp)
+//
+//    ) {
+//        // Add Header first
+//        Header()
+//
+//        // Add Spacer if necessary to give space for the content
+//        Spacer(modifier = Modifier.height(16.dp)) // Optional spacing
+//
+//        // Then add Content
+//        Content()
+//    }
+//}
 
 @Composable
 fun Header() {
@@ -191,16 +199,17 @@ fun Header() {
     Column (
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally, // Center the items horizontally
         verticalArrangement = Arrangement.Center // Center the items vertically
     ) {
         AsyncImage(
-            model = "https://img.freepik.com/free-vector/isometric-data-visualization-concept-background_23-2148106145.jpg",
+            model = "https://png.pngtree.com/background/20230527/original/pngtree-hd-headphone-on-black-background-with-pink-and-bright-blue-lights-picture-image_2760698.jpg",
             contentDescription = "im",
             modifier = Modifier
-                .size(250.dp) // Size of the image
+                .size(240.dp) // Size of the image
                 .clip(CircleShape) // Makes the image circular
+                .background(color = Color.Black)
         )
         Spacer(modifier = Modifier.height(15.dp))
         Text(
@@ -211,21 +220,21 @@ fun Header() {
     }
 }
 
-@Composable
-fun Content() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-//            .weight(1f)
-            .padding(16.dp)
-    ) {
-        // Connected Device Details
-//        ConnectedDeviceDetails()
-
-        // Grid of Devices
-        DeviceGrid()
-    }
-}
+//@Composable
+//fun Content() {
+//    Column(
+//        modifier = Modifier
+//            .fillMaxWidth()
+////            .weight(1f)
+//            .padding(8.dp)
+//    ) {
+//        // Connected Device Details
+////        ConnectedDeviceDetails()
+//
+//        // Grid of Devices
+//        DeviceGrid()
+//    }
+//}
 
 
 @Composable
@@ -236,7 +245,7 @@ fun ConnectedDeviceDetails() {
 
 
 data class Device(
-    val id: String,
+    val id: Int,
     val name: String,
     val infoLine1: String,
     val infoLine2: String,
@@ -245,80 +254,34 @@ data class Device(
 )
 
 @Composable
-fun DeviceGrid() {
+fun DeviceScreen() {
     val devices = listOf(
-        Device(
-            id = "1",
-            name = "Device 1",
-            infoLine1 = "Info Line 1",
-            infoLine2 = "Info Line 2",
-            isAuthenticated = true,
-            isConnected = false
-        ),
-        Device(
-            id = "2",
-            name = "Device 2",
-            infoLine1 = "Info Line 1",
-            infoLine2 = "Info Line 2",
-            isAuthenticated = true,
-            isConnected = false
-        ),
-        Device(
-            id = "3",
-            name = "Device 3",
-            infoLine1 = "Info Line 1",
-            infoLine2 = "Info Line 2",
-            isAuthenticated = true,
-            isConnected = false
-        ),
-        Device(
-            id = "4",
-            name = "Shreya Tm-x 4",
-            infoLine1 = "Info Line 1",
-            infoLine2 = "Info Line 2",
-            isAuthenticated = true,
-            isConnected = true
-        ),
-        Device(
-            id = "5",
-            name = "Device 5",
-            infoLine1 = "Info Line 1",
-            infoLine2 = "Info Line 2",
-            isAuthenticated = true,
-            isConnected = false
-        ),
-        Device(
-            id = "6",
-            name = "Device 6",
-            infoLine1 = "Info Line 1",
-            infoLine2 = "Info Line 2",
-            isAuthenticated = true,
-            isConnected = false
-        ),
-        Device(
-            id = "7",
-            name = "Device 5",
-            infoLine1 = "Info Line 1",
-            infoLine2 = "Info Line 2",
-            isAuthenticated = true,
-            isConnected = false
-        ),
-        Device(
-            id = "8",
-            name = "Device 6",
-            infoLine1 = "Info Line 1",
-            infoLine2 = "Info Line 2",
-            isAuthenticated = true,
-            isConnected = false
-        )
+        Device(1, "JBL Flip 5", "E8:53:F3:51:94:97", "-82 dB", true, false),
+        Device(2, "Sony WH-1000XM4", "A4:C3:F0:22:15:8E", "-75 dB", true, true),
+        Device(3, "Apple AirPods Pro", "B2:45:67:89:10:AB", "-90 dB", false, false),
+        Device(4, "Samsung Galaxy Buds Pro", "C3:D4:E5:F6:12:34", "-68 dB", true, false),
+        Device(5, "Bose QuietComfort 35 II", "D5:E6:F7:18:29:3A", "-95 dB", false, true),
+        Device(6, "Fitbit Versa 3", "E7:F8:19:20:3B:4C", "-60 dB", true, false),
+        Device(7, "Logitech G533", "F9:10:2A:3B:4C:5D", "-88 dB", false, false),
+        Device(8, "Xiaomi Mi Band 6", "1A:2B:3C:4D:5E:6F", "-72 dB", true, true),
+        Device(9, "Beats Solo Pro", "2C:3D:4E:5F:6A:7B", "-80 dB", true, false),
+        Device(10, "Garmin Venu 2", "3E:4F:5A:6B:7C:8D", "-85 dB", false, false)
     )
 
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        modifier = Modifier.fillMaxSize()
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(bottom = 56.dp)
     ) {
-        items(devices) { device ->
-            DeviceItem(device)
+        // Header as the first item
+        item {
+            Header()
+        }
+
+        items(
+            count = devices.size,
+            key = { index -> devices[index].id }
+        ) { index ->
+            DeviceItem(devices[index])
         }
     }
 }
@@ -327,83 +290,115 @@ fun DeviceGrid() {
 fun DeviceItem(device: Device) {
     Card(
         modifier = Modifier
-            .padding(8.dp)
+            .padding(10.dp)
             .fillMaxWidth()
+            .height(150.dp) // Adjust height for row layout
+            .width(200.dp)
+            .clip(RoundedCornerShape(18.dp))
             .border(
                 width = 1.dp,
                 color = CardBorderColor,
-                shape = MaterialTheme.shapes.medium
+                shape = RoundedCornerShape(18.dp)
             ),
         backgroundColor = MaterialTheme.colors.surface, // Transparent light gray background
         elevation = 0.dp // Remove elevation to avoid shadow
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+            // Left Column: Device Name, MAC Address, and Signal Strength
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.Center
             ) {
-                Text(
-                    text = "Authentication",
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colors.onSurface // Black text
-                )
-                Switch(
-                    checked = device.isAuthenticated,
-                    onCheckedChange = { /* Handle toggle */ },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = MaterialTheme.colors.secondary, // Blue thumb
-                        checkedTrackColor = MaterialTheme.colors.secondary.copy(alpha = 0.5f), // Light blue track
-                        uncheckedThumbColor = Color.Gray, // Gray thumb when unchecked
-                        uncheckedTrackColor = Color.LightGray // Light gray track when unchecked
-                    )
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = device.name,
-                fontSize = 20.sp,
-                color = MaterialTheme.colors.onSurface // Black text
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = device.infoLine1,
-                fontSize = 17.sp,
-                color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f) // Dark gray text (70% opacity)
-            )
-            Text(
-                text = device.infoLine2,
-                fontSize = 17.sp,
-                color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f) // Dark gray text (70% opacity)
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.BottomEnd
-            ) {
-                Button(
-                    onClick = { /* Handle connect */ },
-                    enabled = !device.isConnected,
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = MaterialTheme.colors.secondary, // Blue button
-                        contentColor = Color.White // White text
-                    )
+                // Authentication and Toggle in a Row
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = if (device.isConnected) "Connected" else "Connect",
-                        color = if (device.isConnected) Color(0xFF88D66C) else Color.White )
+                        text = "Authentication",
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colors.onSurface // Black text
+                    )
+                    Switch(
+                        checked = device.isAuthenticated,
+                        onCheckedChange = { /* Handle toggle */ },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = MaterialTheme.colors.secondary, // Blue thumb
+                            checkedTrackColor = MaterialTheme.colors.secondary.copy(alpha = 0.5f), // Light blue track
+                            uncheckedThumbColor = Color.Gray, // Gray thumb when unchecked
+                            uncheckedTrackColor = Color.LightGray // Light gray track when unchecked
+                        )
+                    )
+                }
 
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Device Name
+                Text(
+                    text = device.name,
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colors.onSurface // Black text
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // MAC Address, Signal Strength, and Connect Button in a Row
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    // MAC Address and Signal Strength
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = device.infoLine1,
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f) // Dark gray text (70% opacity)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp)) // Add spacing between MAC and Signal Strength
+                        Text(
+                            text = device.infoLine2,
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f) // Dark gray text (70% opacity)
+                        )
+                    }
+
+                    // Connect Button
+                    Button(
+                        onClick = { /* Handle connect */ },
+                        enabled = !device.isConnected,
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = MaterialTheme.colors.secondary, // Blue button
+                            contentColor = Color.White // White text
+                        ),
+                        modifier = Modifier.wrapContentWidth()
+                    ) {
+                        Text(
+                            text = if (device.isConnected) "Connected" else "Connect",
+                            color = if (device.isConnected) Color(0xFF88D66C) else Color.White
+                        )
+                    }
                 }
             }
         }
     }
 }
 
+@Composable
+fun BeaconScreen() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text("Beacon Screen", fontSize = 24.sp)
+    }
+}
