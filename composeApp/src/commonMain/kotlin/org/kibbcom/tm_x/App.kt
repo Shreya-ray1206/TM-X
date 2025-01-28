@@ -52,7 +52,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import dev.icerock.moko.permissions.PermissionState
+import dev.icerock.moko.permissions.compose.BindEffect
+import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
 
 
 private val LightColorPalette = lightColors(
@@ -85,7 +89,50 @@ fun AppTheme(content: @Composable () -> Unit) {
 @Preview
 fun App(navigationState: NavigationState = remember { NavigationState() }) {
     AppTheme { // Apply the custom theme here
-        Scaffold(
+
+        val factory = rememberPermissionsControllerFactory()
+        val controller = remember(factory) {
+            factory.createPermissionsController()
+        }
+
+        BindEffect(controller)
+
+        val viewModel = viewModel {
+            PermissionsViewModel(controller)
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            when(viewModel.state) {
+                PermissionState.Granted -> {
+                    Text("Record audio permission granted!")
+                }
+                PermissionState.DeniedAlways -> {
+                    Text("Permission was permanently declined.")
+                    Button(onClick = {
+                        controller.openAppSettings()
+                    }) {
+                        Text("Open app settings")
+                    }
+                }
+                else -> {
+                    Button(
+                        onClick = {
+                            viewModel.provideOrRequestRecordAudioPermission()
+                        }
+                    ) {
+                        Text("Request permission")
+                    }
+                }
+            }
+        }
+
+        /*Scaffold(
+
             topBar = {
                 TopAppBar(
                     title = {
@@ -100,7 +147,7 @@ fun App(navigationState: NavigationState = remember { NavigationState() }) {
             bottomBar = { Footer(navigationState) }
         ) { innerPadding ->
             Navigation(navigationState, Modifier.padding(innerPadding))
-        }
+        }*/
     }
 }
 
