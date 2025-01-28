@@ -1,5 +1,6 @@
 package org.kibbcom.tm_x
 
+import androidx.compose.runtime.remember
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 
@@ -8,6 +9,6 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "HelloWorld",
     ) {
-        App()
+        App(navigationState = remember { NavigationState() })
     }
 }

@@ -15,6 +15,10 @@ class NavigationState {
 }
 
 sealed class Screen {
-    object Device : Screen()
-    object Beacon : Screen()
+    object Device : Screen(){
+        override fun toString(): String = "Device"
+    }
+    object Beacon : Screen(){
+        override fun toString(): String = "Beacon"
+    }
 }
