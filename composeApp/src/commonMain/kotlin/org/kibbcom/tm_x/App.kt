@@ -1,7 +1,9 @@
 package org.kibbcom.tm_x
 
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.Button
@@ -28,58 +31,91 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
+import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.lightColors
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 
+
+private val LightColorPalette = lightColors(
+    primary = Color.Black, // Black for TopBar and BottomBar
+    primaryVariant = Color(0xFF333333), // Darker black for variations
+    secondary = Color(0xFF03A9F4), // Light blue for secondary elements
+    background = Color.Black, // Dark gray background
+    surface = Color(0xFFF5F5F5).copy(alpha = 0.2f), // Transparent surface for cards
+    onPrimary = Color.White, // White text on primary (black)
+    onSecondary = Color.Black, // Black text on secondary
+    onBackground = Color.White, // White text on background
+    onSurface = Color.White, // White text on surface (cards)
+)
+
+val CardBorderColor = Color(0xFFCCCCCC)
+@Composable
+fun AppTheme(content: @Composable () -> Unit) {
+    MaterialTheme(
+        colors = LightColorPalette,
+        typography = MaterialTheme.typography, // Use default typography
+        shapes = MaterialTheme.shapes, // Use default shapes
+        content = content
+    )
+}
 
 
 
 
 @Composable
 @Preview
-fun App(navigationState: NavigationState = remember { NavigationState() } ) {
-    Scaffold (
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text("Kibbcom TM-X")
-                },
-                actions = {
-                    DeviceStatusIndicator(isConnected = true)
-                }
-            )
-        },
-        bottomBar = { Footer(navigationState) }
-    ){
-            innerPadding ->
-        Navigation(navigationState, Modifier.padding(innerPadding))
+fun App(navigationState: NavigationState = remember { NavigationState() }) {
+    AppTheme { // Apply the custom theme here
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text("Kibbcom TM-X", color = MaterialTheme.colors.onPrimary)
+                    },
+                    backgroundColor = MaterialTheme.colors.primary, // Black
+                    actions = {
+                        DeviceStatusIndicator(isConnected = true)
+                    }
+                )
+            },
+            bottomBar = { Footer(navigationState) }
+        ) { innerPadding ->
+            Navigation(navigationState, Modifier.padding(innerPadding))
+        }
     }
-
 }
 
-@Composable
-fun DeviceStatusIndicator(isConnected: Boolean){
-    val color = if (isConnected) Color.Green else Color.Gray
 
-    Box (
+
+@Composable
+fun DeviceStatusIndicator(isConnected: Boolean) {
+    val color = if (isConnected) Color(0xFF88D66C) else Color.Gray
+
+    Box(
         modifier = Modifier
             .size(24.dp)
             .clip(shape = CircleShape)
             .background(color)
-
-    ){  }
+    ) {}
 }
 
 @Composable
@@ -87,7 +123,9 @@ fun Footer(navigationState: NavigationState){
     val items = listOf(Screen.Device, Screen.Beacon)
     val selectedItem = navigationState.currentScreen
 
-    BottomNavigation {
+    BottomNavigation(
+        backgroundColor = MaterialTheme.colors.primary
+    ) {
         items.forEach { screen ->
             BottomNavigationItem(
                 icon = {
@@ -114,13 +152,22 @@ fun Navigation(navigationState: NavigationState, modifier: Modifier = Modifier) 
 }
 
 @Composable
-fun DeviceScreen() {
+fun DeviceScreen(
+
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
+
     ) {
+        // Add Header first
         Header()
+
+        // Add Spacer if necessary to give space for the content
+        Spacer(modifier = Modifier.height(16.dp)) // Optional spacing
+
+        // Then add Content
         Content()
     }
 }
@@ -137,30 +184,31 @@ fun BeaconScreen() {
 }
 
 @Composable
-fun Header(){
+fun Header() {
     val deviceName = "Connected Device Name"
-    val deviceImage = imageResource("device_img")
 
-    Row (
+
+    Column (
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
-//        verticalAlignment = Alignment.CenterVertically
-        horizontalArrangement = Arrangement.Center
-    ){
-//        Image(
-//            painter = painterResource(resource = Res.drawable(deviceImage)),
-//            contentDescription = "Device Image",
-//            modifier = Modifier.size(48.dp)
-//        )
-        Spacer(modifier = Modifier.width(8.dp)) // Using dp here
+        horizontalAlignment = Alignment.CenterHorizontally, // Center the items horizontally
+        verticalArrangement = Arrangement.Center // Center the items vertically
+    ) {
+        AsyncImage(
+            model = "https://img.freepik.com/free-vector/isometric-data-visualization-concept-background_23-2148106145.jpg",
+            contentDescription = "im",
+            modifier = Modifier
+                .size(250.dp) // Size of the image
+                .clip(CircleShape) // Makes the image circular
+        )
+        Spacer(modifier = Modifier.height(15.dp))
         Text(
             text = deviceName,
-            style = MaterialTheme.typography.h6
+            style = MaterialTheme.typography.h6,
+            color = MaterialTheme.colors.onBackground
         )
-
     }
-
 }
 
 @Composable
@@ -281,11 +329,17 @@ fun DeviceItem(device: Device) {
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
+            .border(
+                width = 1.dp,
+                color = CardBorderColor,
+                shape = MaterialTheme.shapes.medium
+            ),
+        backgroundColor = MaterialTheme.colors.surface, // Transparent light gray background
+        elevation = 0.dp // Remove elevation to avoid shadow
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            // Row for Authentication + Toggle
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -293,36 +347,43 @@ fun DeviceItem(device: Device) {
             ) {
                 Text(
                     text = "Authentication",
-                    fontSize = 12.sp
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colors.onSurface // Black text
                 )
                 Switch(
                     checked = device.isAuthenticated,
-                    onCheckedChange = { /* Handle toggle */ }
+                    onCheckedChange = { /* Handle toggle */ },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colors.secondary, // Blue thumb
+                        checkedTrackColor = MaterialTheme.colors.secondary.copy(alpha = 0.5f), // Light blue track
+                        uncheckedThumbColor = Color.Gray, // Gray thumb when unchecked
+                        uncheckedTrackColor = Color.LightGray // Light gray track when unchecked
+                    )
                 )
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Device Name
             Text(
                 text = device.name,
-                fontSize = 20.sp
+                fontSize = 20.sp,
+                color = MaterialTheme.colors.onSurface // Black text
             )
 
             Spacer(modifier = Modifier.height(8.dp))
-
 
             Text(
                 text = device.infoLine1,
-                fontSize = 17.sp
+                fontSize = 17.sp,
+                color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f) // Dark gray text (70% opacity)
             )
             Text(
                 text = device.infoLine2,
-                fontSize = 17.sp
+                fontSize = 17.sp,
+                color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f) // Dark gray text (70% opacity)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
-
 
             Box(
                 modifier = Modifier.fillMaxWidth(),
@@ -330,9 +391,16 @@ fun DeviceItem(device: Device) {
             ) {
                 Button(
                     onClick = { /* Handle connect */ },
-                    enabled = !device.isConnected
+                    enabled = !device.isConnected,
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = MaterialTheme.colors.secondary, // Blue button
+                        contentColor = Color.White // White text
+                    )
                 ) {
-                    Text(text = if (device.isConnected) "Connected" else "Connect")
+                    Text(
+                        text = if (device.isConnected) "Connected" else "Connect",
+                        color = if (device.isConnected) Color(0xFF88D66C) else Color.White )
+
                 }
             }
         }
