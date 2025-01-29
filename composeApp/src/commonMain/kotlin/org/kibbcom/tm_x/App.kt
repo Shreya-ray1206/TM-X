@@ -96,7 +96,7 @@ fun Footer(navigationState: NavigationState){
     BottomNavigation() {
         items.forEach { screen ->
             BottomNavigationItem(
-                icon = { Icon(Icons.Default.Add, contentDescription = screen.toString()) },
+                icon = { Icon(Icons.Default.Addgit merge main, contentDescription = screen.toString()) },
                 label = { Text(screen.toString()) },
                 selected = selectedItem == screen,
                 onClick = { navigationState.navigateTo(screen) }
