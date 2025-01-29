@@ -56,6 +56,11 @@ kotlin {
             implementation(libs.coil.network.ktor3)
             implementation(libs.ktor.client.core)
 
+            implementation(libs.lifecycle.viewmodel)
+            implementation(libs.lifecycle.viewmodel.compose)
+            api(libs.moko.permissions)
+            api(libs.moko.permissions.compose)
+
             implementation("com.juul.kable:core:0.23.0") // Or latest stable version
 
 

@@ -57,7 +57,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import dev.icerock.moko.permissions.PermissionState
+import dev.icerock.moko.permissions.compose.BindEffect
+import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
+import org.kibbcom.tm_x.ble.PermissionsViewModel
 
 
 private val LightColorPalette = lightColors(
@@ -90,7 +95,10 @@ fun AppTheme(content: @Composable () -> Unit) {
 @Preview
 fun App(navigationState: NavigationState = remember { NavigationState() }) {
     AppTheme { // Apply the custom theme here
-        Scaffold(
+
+        MainScreen()
+
+    /*    Scaffold(
             topBar = {
                 TopAppBar(
                     title = {
@@ -117,11 +125,70 @@ fun App(navigationState: NavigationState = remember { NavigationState() }) {
                 navigationState,
                 Modifier.padding(innerPadding)
             )
-        }
+        }*/
     }
 }
 
+@Composable
+fun MainScreen(){
+    val factory = rememberPermissionsControllerFactory()
+    val controller = remember(factory) {
+        factory.createPermissionsController()
+    }
 
+    BindEffect(controller)
+
+    val viewModel = viewModel {
+        PermissionsViewModel(controller)
+    }
+
+    // val devices = viewModel.devices.collectAsState(emptyList())
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        when(viewModel.state) {
+            PermissionState.Granted -> {
+                Text("BLE permission granted!")
+                Button(onClick = {
+                    //TODO
+                }) {
+                    Text("Scan Devices")
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    /* items(devices.value) { device ->
+                         DeviceItem(device = device)
+                     }*/
+                }
+            }
+            PermissionState.DeniedAlways -> {
+                Text("Permission was permanently declined.")
+                Button(onClick = {
+                    controller.openAppSettings()
+                }) {
+                    Text("Open app settings")
+                }
+            }
+            else -> {
+                Button(
+                    onClick = {
+                        viewModel.provideOrRequestBLEPermission()
+                    }
+                ) {
+                    Text("Request permission")
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun DeviceStatusIndicator(isConnected: Boolean) {
