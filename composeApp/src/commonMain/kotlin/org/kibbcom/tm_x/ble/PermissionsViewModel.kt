@@ -13,6 +13,11 @@ import dev.icerock.moko.permissions.PermissionState
 import dev.icerock.moko.permissions.PermissionsController
 import dev.icerock.moko.permissions.RequestCanceledException
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
+
+
 class PermissionsViewModel (
     private val controller: PermissionsController
 ): ViewModel() {
@@ -22,9 +27,9 @@ class PermissionsViewModel (
 
     private val scanner = Scanner()
 
- /*   private val _devices = MutableStateFlow<List<String>>(emptyList()) // You can store the device names here
+    private val _devices = MutableStateFlow<List<String>>(emptyList()) // You can store the device names here
     val devices: StateFlow<List<String>> = _devices
-*/
+
     init {
         viewModelScope.launch {
             state = controller.getPermissionState(Permission.BLUETOOTH_SCAN)
@@ -51,8 +56,18 @@ class PermissionsViewModel (
             try {
                 // Start scanning and collect advertisements
                 scanner.advertisements.collect { advertisement ->
-                    // You can filter and collect advertisements as needed
-                   // _devices.value = _devices.value + advertisement.deviceName
+
+                    val deviceName = advertisement.name ?: "Unknown Device"
+
+                    _devices.update { currentList ->
+                        if (deviceName !in currentList) {
+                            currentList + deviceName // Add only if it's not already in the list
+                        } else {
+                            currentList // Keep the existing list unchanged
+                        }
+                    }
+
+
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

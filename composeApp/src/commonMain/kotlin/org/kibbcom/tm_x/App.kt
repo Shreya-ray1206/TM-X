@@ -142,7 +142,7 @@ fun MainScreen(){
         PermissionsViewModel(controller)
     }
 
-    // val devices = viewModel.devices.collectAsState(emptyList())
+     val devices = viewModel.devices.collectAsState(emptyList())
 
     Column(
         modifier = Modifier
@@ -154,7 +154,7 @@ fun MainScreen(){
             PermissionState.Granted -> {
                 Text("BLE permission granted!")
                 Button(onClick = {
-                    //TODO
+                  viewModel.startScanning()
                 }) {
                     Text("Scan Devices")
                 }
@@ -164,9 +164,19 @@ fun MainScreen(){
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    /* items(devices.value) { device ->
-                         DeviceItem(device = device)
-                     }*/
+
+                    items(devices.value.size) { index -> // Provide size for items
+                        val deviceName = devices.value[index] // Get device name by index
+                        Text(
+                            text = deviceName,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            style = MaterialTheme.typography.body1
+                        )
+                    }
+
+
                 }
             }
             PermissionState.DeniedAlways -> {
