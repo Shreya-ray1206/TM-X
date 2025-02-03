@@ -7,7 +7,7 @@ import androidx.compose.ui.window.application
 fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
-        title = "HelloWorld",
+        title = "TMX",
     ) {
         App(navigationState = remember { NavigationState() })
     }

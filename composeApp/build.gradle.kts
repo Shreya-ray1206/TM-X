@@ -37,14 +37,15 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
-
-
+            implementation("androidx.core:core-ktx:1.15.0")
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
             implementation(libs.ktor.client.okhttp)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material)
+            implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
@@ -60,10 +61,14 @@ kotlin {
             implementation(libs.lifecycle.viewmodel.compose)
             api(libs.moko.permissions)
             api(libs.moko.permissions.compose)
+            implementation("com.juul.kable:kable-core:0.35.0")
+            implementation("androidx.core:core-ktx:1.15.0")
+            implementation("dev.bluefalcon:blue-falcon:2.2.4")
+            api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
 
-            implementation("com.juul.kable:core:0.23.0") // Or latest stable version
 
-
+            implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0") // for Compose integration
+            implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.0")
 
 
         }
@@ -82,12 +87,12 @@ kotlin {
 
 android {
     namespace = "org.kibbcom.tm_x"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "org.kibbcom.tm_x"
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
+        minSdk = 21
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
     }
@@ -108,6 +113,8 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.runtime.android)
+    implementation(libs.androidx.bluetooth)
     debugImplementation(compose.uiTooling)
 }
 

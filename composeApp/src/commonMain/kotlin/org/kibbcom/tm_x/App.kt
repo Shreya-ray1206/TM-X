@@ -1,7 +1,6 @@
 package org.kibbcom.tm_x
 
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -20,8 +19,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
@@ -32,37 +29,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.BottomAppBar
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
-import androidx.compose.material.Scaffold
 import androidx.compose.material.SwitchDefaults
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.lightColors
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import dev.icerock.moko.permissions.PermissionState
 import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
+import org.kibbcom.tm_x.ble.BleScanningScreen
 import org.kibbcom.tm_x.ble.PermissionsViewModel
+import org.kibbcom.tm_x.theme.TmxAppTheme
 
 
 private val LightColorPalette = lightColors(
@@ -94,43 +83,14 @@ fun AppTheme(content: @Composable () -> Unit) {
 @Composable
 @Preview
 fun App(navigationState: NavigationState = remember { NavigationState() }) {
-    AppTheme { // Apply the custom theme here
-
-        MainScreen()
-
-    /*    Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text("Kibbcom TM-X", color = MaterialTheme.colors.onPrimary)
-                    },
-                    backgroundColor = Color(0xFF373737), // Black
-                    actions = {
-                        DeviceStatusIndicator(isConnected = true)
-                    }
-                )
-            },
-            bottomBar = {
-                BottomAppBar(
-                    backgroundColor =  Color(0xFF373737),
-                    contentColor = MaterialTheme.colors.onPrimary // White icons
-                ) {
-                    // Bottom bar content (e.g., navigation icons)
-                    Footer(navigationState)
-                }
-            }
-        ) {
-                innerPadding ->
-            Navigation(
-                navigationState,
-                Modifier.padding(innerPadding)
-            )
-        }*/
+    TmxAppTheme { // Apply the custom theme here
+        MainScreen(navigationState)
     }
 }
 
+
 @Composable
-fun MainScreen(){
+fun MainScreen(navigationState: NavigationState) {
     val factory = rememberPermissionsControllerFactory()
     val controller = remember(factory) {
         factory.createPermissionsController()
@@ -142,63 +102,81 @@ fun MainScreen(){
         PermissionsViewModel(controller)
     }
 
-     val devices = viewModel.devices.collectAsState(emptyList())
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        when(viewModel.state) {
-            PermissionState.Granted -> {
-                Text("BLE permission granted!")
-                Button(onClick = {
-                  viewModel.startScanning()
-                }) {
-                    Text("Scan Devices")
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-
-                    items(devices.value.size) { index -> // Provide size for items
-                        val deviceName = devices.value[index] // Get device name by index
-                        Text(
-                            text = deviceName,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            style = MaterialTheme.typography.body1
-                        )
+    when (navigationState.currentScreen) {
+        is Screen.Device -> {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+            /*    when (viewModel.blePermissionState) {
+                    PermissionState.Granted -> {
+                        Text("BLE permission granted!")
+                        Button(onClick = {
+                            navigationState.navigateTo(Screen.BleScanning) // Navigate to next screen
+                        }) {
+                            Text("Scan Devices")
+                        }
                     }
 
-
-                }
-            }
-            PermissionState.DeniedAlways -> {
-                Text("Permission was permanently declined.")
-                Button(onClick = {
-                    controller.openAppSettings()
-                }) {
-                    Text("Open app settings")
-                }
-            }
-            else -> {
-                Button(
-                    onClick = {
-                        viewModel.provideOrRequestBLEPermission()
+                    PermissionState.DeniedAlways -> {
+                        Text("Permission was permanently declined.")
+                        Button(onClick = { controller.openAppSettings() }) {
+                            Text("Open app settings")
+                        }
                     }
-                ) {
-                    Text("Request permission")
+
+                    else -> {
+                        Button(onClick = { viewModel.provideOrRequestBLEPermission() }) {
+                            Text("Request permission")
+                        }
+                    }
+                }*/
+
+
+                when {
+                    // Check if both Bluetooth permissions are granted
+                    viewModel.bleScanPermissionState == PermissionState.Granted &&
+                            viewModel.bleConnectPermissionState == PermissionState.Granted -> {
+                        Text("BLE permissions granted!")
+                        Button(onClick = {
+                            navigationState.navigateTo(Screen.BleScanning) // Navigate to next screen
+                        }) {
+                            Text("Scan Devices")
+                        }
+                    }
+
+                    // Handle case where either permission is denied permanently
+                    viewModel.bleScanPermissionState == PermissionState.DeniedAlways ||
+                            viewModel.bleConnectPermissionState == PermissionState.DeniedAlways -> {
+                        Text("One or both BLE permissions were permanently declined.")
+                        Button(onClick = { controller.openAppSettings() }) {
+                            Text("Open app settings")
+                        }
+                    }
+
+                    // Handle case where permissions are not granted or denied
+                    else -> {
+                        Button(onClick = { viewModel.provideOrRequestBLEPermissions() }) {
+                            Text("Request BLE permissions")
+                        }
+                    }
                 }
+
             }
+        }
+
+        is Screen.BleScanning -> {
+            BleScanningScreen() // Show BLE scanning screen when navigated
+        }
+
+        Screen.Beacon -> {
+
         }
     }
 }
+
 
 @Composable
 fun DeviceStatusIndicator(isConnected: Boolean) {
@@ -226,6 +204,7 @@ fun Footer(navigationState: NavigationState){
                     when (screen) {
                         is Screen.Device -> Icon(Icons.Default.Home, contentDescription = screen.toString())
                         is Screen.Beacon -> Icon(Icons.Default.LocationOn, contentDescription = screen.toString())
+                        else -> {}
                     }
                 },
                 label = { Text(screen.toString()) },
@@ -244,6 +223,10 @@ fun Navigation(navigationState: NavigationState, modifier: Modifier = Modifier) 
     when (navigationState.currentScreen) {
         is Screen.Device -> DeviceScreen()
         is Screen.Beacon -> BeaconScreen()
+        Screen.BleScanning -> {
+
+        }
+        else -> {}
     }
 }
 //
