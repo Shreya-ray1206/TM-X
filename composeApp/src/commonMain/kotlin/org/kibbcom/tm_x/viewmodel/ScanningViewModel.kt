@@ -1,4 +1,4 @@
-package org.kibbcom.tm_x.ble
+package org.kibbcom.tm_x.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,9 +8,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.kibbcom.tm_x.BleManager
+import org.kibbcom.tm_x.ble.BleConnectionStatus
+import org.kibbcom.tm_x.ble.BleDeviceCommon
+import org.kibbcom.tm_x.ble.BleManagerInstance
+
 
 class ScanningViewModel() : ViewModel(){
     private val bleManager = BleManager()
+
+
     private val _devicesNative = MutableStateFlow<List<BleDeviceCommon>>(emptyList())
     val devicesNative: StateFlow<List<BleDeviceCommon>> = _devicesNative.asStateFlow()
 

@@ -3,7 +3,7 @@ package org.kibbcom.tm_x
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
-import org.kibbcom.tm_x.ble.ScanningViewModel
+import org.kibbcom.tm_x.viewmodel.ScanningViewModel
 
 // Actual Android implementation of the ViewModelFactory
 actual class ScanningViewModelFactory : ViewModelProvider.Factory {

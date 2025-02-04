@@ -1,4 +1,4 @@
-package org.kibbcom.tm_x.ble
+package org.kibbcom.tm_x.screen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,8 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.juul.kable.State
 import org.kibbcom.tm_x.ScanningViewModelFactory
+import org.kibbcom.tm_x.ble.BleConnectionStatus
+import org.kibbcom.tm_x.viewmodel.ScanningViewModel
 
 @Composable
 fun BleScanningScreen(viewModel: ScanningViewModel = viewModel(factory = ScanningViewModelFactory())) {

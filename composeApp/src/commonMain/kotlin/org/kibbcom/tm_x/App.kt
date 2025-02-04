@@ -49,8 +49,8 @@ import coil3.compose.AsyncImage
 import dev.icerock.moko.permissions.PermissionState
 import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
-import org.kibbcom.tm_x.ble.BleScanningScreen
-import org.kibbcom.tm_x.ble.PermissionsViewModel
+import org.kibbcom.tm_x.screen.BleScanningScreen
+import org.kibbcom.tm_x.viewmodel.PermissionsViewModel
 import org.kibbcom.tm_x.theme.TmxAppTheme
 
 

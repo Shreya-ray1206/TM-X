@@ -1,4 +1,4 @@
-package org.kibbcom.tm_x.ble
+package org.kibbcom.tm_x.viewmodel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

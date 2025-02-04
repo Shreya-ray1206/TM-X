@@ -63,7 +63,7 @@ kotlin {
             implementation(libs.lifecycle.viewmodel.compose)
             api(libs.moko.permissions)
             api(libs.moko.permissions.compose)
-            implementation("com.juul.kable:kable-core:0.35.0")
+
             implementation("androidx.core:core-ktx:1.15.0")
             api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
         }
