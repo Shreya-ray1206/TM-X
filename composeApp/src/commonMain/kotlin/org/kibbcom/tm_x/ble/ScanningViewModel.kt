@@ -2,107 +2,50 @@ package org.kibbcom.tm_x.ble
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.juul.kable.Advertisement
-import com.juul.kable.Peripheral
-import com.juul.kable.Scanner
-import com.juul.kable.State
-
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.kibbcom.tm_x.BleManager
 
 class ScanningViewModel() : ViewModel(){
+    private val bleManager = BleManager()
+    private val _devicesNative = MutableStateFlow<List<BleDeviceCommon>>(emptyList())
+    val devicesNative: StateFlow<List<BleDeviceCommon>> = _devicesNative.asStateFlow()
 
-    private val scanner = Scanner()
+    private val _connectionState = MutableStateFlow<BleConnectionStatus>(BleConnectionStatus.IDLE)
+    val connectionState: StateFlow<BleConnectionStatus> = _connectionState.asStateFlow()
 
-    private var connectedPeripheral: Peripheral? = null
-
-    private val _devices = MutableStateFlow<List<BleDevice>>(emptyList()) // You can store the device names here
-    val devices: StateFlow<List<BleDevice>> = _devices
-
-
-
-    private val _connectionStatus = MutableStateFlow<State>(State.Disconnected())
-    val connectionStatus: StateFlow<State> = _connectionStatus
-
-
-    fun startScanning() {
+    init {
         viewModelScope.launch {
-            try {
+            bleManager.scanResults.collectLatest { scannedDevices ->
+                _devicesNative.value = scannedDevices
+            }
+        }
 
-                // Start scanning and collect advertisements
-                scanner.advertisements.collect { advertisement ->
-
-                    val deviceName = advertisement.name ?: "Unknown Device"
-                    val txPower = advertisement.txPower ?: 0
-                    val newDevice = BleDevice(
-                        name = deviceName,
-                        peripheralName = "",  // Use peripheral name
-                        txPower = null,
-                        advertisement = advertisement
-                    )
-
-                    _devices.update { currentList ->
-                        if (newDevice !in currentList) {
-                            currentList + newDevice // Add the new device if not already present
-                        } else {
-                            currentList // Keep the list unchanged if device already exists
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
+        viewModelScope.launch {
+            bleManager.connectionState.collectLatest { state ->
+                _connectionState.value = state
+                println("BLE Connection State Updated: $state")
             }
         }
     }
-
-
-
-    fun connectToDevice(advertisement: Advertisement?) {
-        viewModelScope.launch {
-            try {
-                val peripheral = advertisement?.let { Peripheral(it) }
-                connectedPeripheral = peripheral
-
-                // Observe connection state from Kable
-                peripheral?.state?.onEach { state ->
-                    _connectionStatus.value = state
-                }?.launchIn(viewModelScope)
-
-                peripheral?.connect()
-
-                println("Connecting to ${advertisement?.name ?: "Unknown Device"}")
-            } catch (e: Exception) {
-                e.printStackTrace()
-                println("Failed to connect: ${e.message}")
-            }
-        }
+    fun scanDevices() {
+        bleManager.scanDevices()
     }
 
-
-    fun disconnectDevice() {
-        viewModelScope.launch {
-            try {
-                connectedPeripheral?.disconnect()
-                connectedPeripheral = null
-                _connectionStatus.value = State.Disconnected()
-                println("Device disconnected")
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
+    fun connectToDevice(deviceId: String) {
+        bleManager.connectToDevice(deviceId)
     }
 
+    fun stopScanningDevice() {
+        bleManager.stopScanning()
+    }
+
+    fun bondWithDevice(deviceId: String) {
+        bleManager.bondWithDevice(deviceId)
+    }
 
 }
 
-data class BleDevice(
-    val name: String?,
-    val peripheralName: String?,  // Name of the peripheral (or unique identifier)
-    val txPower: Int?,
-    val advertisement : Advertisement?
-)

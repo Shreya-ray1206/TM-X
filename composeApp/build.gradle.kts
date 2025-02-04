@@ -63,7 +63,6 @@ kotlin {
             api(libs.moko.permissions.compose)
             implementation("com.juul.kable:kable-core:0.35.0")
             implementation("androidx.core:core-ktx:1.15.0")
-            implementation("dev.bluefalcon:blue-falcon:2.2.4")
             api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
 
 
