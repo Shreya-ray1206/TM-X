@@ -23,6 +23,7 @@ actual class BleManager actual constructor() : NSObject(), CBCentralManagerDeleg
     actual val scanResults: StateFlow<List<BleDeviceCommon>> = _scanResults.asStateFlow()
     private val _connectionState = MutableStateFlow(BleConnectionStatus.IDLE)
     actual val connectionState = _connectionState.asStateFlow()
+
     init {
         centralManager = CBCentralManager(this, null)
     }
@@ -34,32 +35,44 @@ actual class BleManager actual constructor() : NSObject(), CBCentralManagerDeleg
         } else {
             println("Bluetooth is not enabled.")
         }
-
     }
 
     actual fun connectToDevice(deviceId: String) {
         val peripheral = discoveredPeripherals[deviceId]
         peripheral?.let {
-            centralManager?.connectPeripheral(it, null)
-            println("Connecting to $deviceId")
+            // Check if the peripheral is already connected
+            if (it.state != platform.CoreBluetooth.CBPeripheralStateConnected) {
+                centralManager?.connectPeripheral(it, null)
+                println("Connecting to $deviceId")
+            } else {
+                println("Already connected to $deviceId")
+            }
         } ?: println("Device not found")
-
     }
-
 
     actual fun bondWithDevice(deviceId: String) {
         val peripheral = discoveredPeripherals[deviceId]
         peripheral?.let {
-            it.delegate = this
-            _connectionState.value = BleConnectionStatus.BONDING
-            println("Bonding initiated with $deviceId")
-            it.discoverServices(null) // This triggers `didDiscoverServices`
+            // Check if the peripheral is connected
+            if (it.state == platform.CoreBluetooth.CBPeripheralStateConnected) {
+                it.delegate = this
+                _connectionState.value = BleConnectionStatus.BONDING
+                println("Bonding initiated with $deviceId")
+                it.discoverServices(null) // This triggers `didDiscoverServices`
+            } else {
+                // If not connected, connect first
+                _connectionState.value = BleConnectionStatus.CONNECTING
+                centralManager?.connectPeripheral(it, null)
+                println("Connecting to $deviceId")
+            }
         } ?: println("Device not found")
     }
 
     override fun centralManagerDidUpdateState(central: CBCentralManager) {
         if (central.state == CBManagerStatePoweredOn) {
             println("Bluetooth is enabled.")
+            // Initiate scanning only when Bluetooth is enabled
+            centralManager?.scanForPeripheralsWithServices(null, null)
         } else {
             println("Bluetooth is not available.")
         }
@@ -67,30 +80,47 @@ actual class BleManager actual constructor() : NSObject(), CBCentralManagerDeleg
 
     override fun centralManager(central: CBCentralManager, didDiscoverPeripheral: CBPeripheral, advertisementData: Map<Any?, *>, RSSI: NSNumber) {
         val id = didDiscoverPeripheral.identifier.UUIDString
+        println("Discovered peripheral: $id")
+
+        // Ensure peripheral is not already in the list
         if (!discoveredPeripherals.containsKey(id)) {
             discoveredPeripherals[id] = didDiscoverPeripheral
             val newDevice = BleDeviceCommon(id = id, name = didDiscoverPeripheral.name ?: "Unknown")
-            val updatedList = _scanResults.value.toMutableList().apply { add(newDevice) }
-            _scanResults.value = updatedList.distinctBy { it.id }
-            println("Discovered device: ${newDevice.name} ($id)")
+
+            if(newDevice.name?.startsWith("Unknown") == false){
+                val updatedList = _scanResults.value.toMutableList().apply { add(newDevice) }
+                _scanResults.value = updatedList.distinctBy { it.id }
+                println("Discovered device: ${newDevice.name} ($id)")
+            }
         }
     }
 
     override fun centralManager(central: CBCentralManager, didConnectPeripheral: CBPeripheral) {
-        println("Connected to ${didConnectPeripheral.identifier.UUIDString}")
-        didConnectPeripheral.delegate = this
-        didConnectPeripheral.discoverServices(null)
+        val deviceId = didConnectPeripheral.identifier.UUIDString
+        if (_connectionState.value != BleConnectionStatus.CONNECTED) {
+            println("Connected to $deviceId")
+            _connectionState.value = BleConnectionStatus.CONNECTED
+            didConnectPeripheral.delegate = this
+            didConnectPeripheral.discoverServices(null)
+        } else {
+            println("Already connected to $deviceId. Skipping service discovery.")
+        }
     }
 
     // Called when services are discovered
     override fun peripheral(peripheral: CBPeripheral, didDiscoverServices: NSError?) {
+        val deviceId = peripheral.identifier.UUIDString
         if (didDiscoverServices == null) {
-            println("Services discovered for ${peripheral.identifier.UUIDString}")
+            println("Services discovered for $deviceId")
 
-            // Bonding complete, now connect
-            val deviceId = peripheral.identifier.UUIDString
-            _connectionState.value = BleConnectionStatus.CONNECTING
-            connectToDevice(deviceId)
+            // Only proceed if the connection state is CONNECTED
+            if (_connectionState.value == BleConnectionStatus.CONNECTED) {
+                // Proceed with further bonding or service interactions
+                _connectionState.value = BleConnectionStatus.CONNECTED
+            } else {
+                println("Service discovery failed because the peripheral is not connected.")
+                _connectionState.value = BleConnectionStatus.DISCONNECTED
+            }
         } else {
             println("Service discovery failed: ${didDiscoverServices.localizedDescription}")
             _connectionState.value = BleConnectionStatus.DISCONNECTED
@@ -102,7 +132,11 @@ actual class BleManager actual constructor() : NSObject(), CBCentralManagerDeleg
     }
 
     actual fun disConnectToDevice(deviceId: String) {
+        val peripheral = discoveredPeripherals[deviceId]
+        peripheral?.let {
+            centralManager?.cancelPeripheralConnection(it)
+            _connectionState.value = BleConnectionStatus.DISCONNECTED
+            println("Disconnected from $deviceId")
+        } ?: println("Device not found")
     }
-
-
 }

@@ -22,27 +22,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juul.kable.State
+import org.kibbcom.tm_x.ScanningViewModelFactory
 
 @Composable
-fun BleScanningScreen( viewModel: ScanningViewModel = viewModel()) {
+fun BleScanningScreen(viewModel: ScanningViewModel = viewModel(factory = ScanningViewModelFactory())) {
     Column(
         modifier = Modifier
             .fillMaxSize(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-
-
         val devicesNative by viewModel.devicesNative.collectAsState()
         val connectionState by viewModel.connectionState.collectAsState()
-
 
         // Start scanning when the screen is composed
         LaunchedEffect(Unit) {
             viewModel.scanDevices()
         }
-
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -60,16 +56,12 @@ fun BleScanningScreen( viewModel: ScanningViewModel = viewModel()) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-
-
         LazyColumn {
             items(devicesNative) { device ->
                 Card(
                     modifier = Modifier.fillMaxWidth().padding(8.dp).clickable {
-
                         viewModel.stopScanningDevice()
                         viewModel.bondWithDevice(device.id)
-
                     },
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -79,8 +71,6 @@ fun BleScanningScreen( viewModel: ScanningViewModel = viewModel()) {
                 }
             }
         }
-
-
     }
 }
 
