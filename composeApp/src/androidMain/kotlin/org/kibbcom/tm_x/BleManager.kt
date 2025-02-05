@@ -39,7 +39,7 @@ actual class BleManager actual constructor() {
     private val _scanResults = MutableStateFlow<List<BleDeviceCommon>>(emptyList())
     actual val scanResults = _scanResults.asStateFlow()
     private val _readData = MutableStateFlow<Pair<String, ByteArray>?>(null)
-    actual val readData = _readData.asStateFlow()
+    actual val readDataResult = _readData.asStateFlow()
 
 
     private val bondReceiver = object : BroadcastReceiver() {
@@ -148,11 +148,11 @@ actual class BleManager actual constructor() {
                         }
                     }
 
-                    // 🔥 UUIDs for service and characteristic
+                   /* // 🔥 UUIDs for service and characteristic
                     val serviceUuid = UUID.fromString("EC7B0001-EDFF-4CCE-9CF8-3B175487D710")
                     val characteristicUuid = UUID.fromString("EC7B0004-EDFF-4CCE-9CF8-3B175487D710")
 
-                    readCharacteristic(serviceUuid, characteristicUuid)
+                    readCharacteristic(serviceUuid, characteristicUuid)*/
                 } else {
                     println("Failed to discover services, status: $status")
                 }
@@ -218,7 +218,11 @@ actual class BleManager actual constructor() {
 
 
     @SuppressLint("MissingPermission")
-    fun readCharacteristic(serviceUdid : UUID, characteristicUuid: UUID) {
+    actual fun readBleData(serviceId: String, characteristicUuid: String) {
+        val serviceUuid = UUID.fromString(serviceId)
+        val characteristicUuids = UUID.fromString(characteristicUuid)
+
+
         println("BluetoothGatt Read method is called.")
 
         val gatt = bluetoothGatt
@@ -227,20 +231,21 @@ actual class BleManager actual constructor() {
             return
         }
 
-        val service = gatt.getService(serviceUdid)
+        val service = gatt.getService(serviceUuid)
         if (service == null) {
-            println("Service with UUID $serviceUdid not found.")
+            println("Service with UUID $serviceUuid not found.")
             return
         }
 
-        val characteristic = service.getCharacteristic(characteristicUuid)
+        val characteristic = service.getCharacteristic(characteristicUuids)
         if (characteristic == null) {
-            println("Characteristic with UUID $characteristicUuid not found.")
+            println("Characteristic with UUID $characteristicUuids not found.")
             return
         }
 
         val success = gatt.readCharacteristic(characteristic)
         println("Read characteristic request sent: $success")
+
     }
 
 

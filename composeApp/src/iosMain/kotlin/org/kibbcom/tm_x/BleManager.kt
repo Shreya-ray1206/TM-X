@@ -140,8 +140,11 @@ actual class BleManager actual constructor() : NSObject(), CBCentralManagerDeleg
         } ?: println("Device not found")
     }
 
-    actual val readData: StateFlow<Pair<String, ByteArray>?>
+    actual val readDataResult: StateFlow<Pair<String, ByteArray>?>
         get() = TODO("Not yet implemented")
+
+    actual fun readBleData(serviceId: String, characteristicUuid: String) {
+    }
 
 
 }

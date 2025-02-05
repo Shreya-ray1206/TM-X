@@ -37,7 +37,7 @@ class ScanningViewModel() : ViewModel(){
             }
         }
         viewModelScope.launch {
-            bleManager.readData.collectLatest { state ->
+            bleManager.readDataResult.collectLatest { state ->
                 state?.let { (stringValue, byteArrayValue) ->
 
                     println("Read Scanning viewmodel ! Data (HEX): ${byteArrayValue.toHexString()}")
@@ -62,6 +62,10 @@ class ScanningViewModel() : ViewModel(){
 
     fun bondWithDevice(deviceId: String) {
         bleManager.bondWithDevice(deviceId)
+    }
+
+    fun readBleData(serviceId: String, characteristicUuid: String){
+        bleManager.readBleData(serviceId,characteristicUuid)
     }
 
 

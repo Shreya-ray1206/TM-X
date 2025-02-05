@@ -25,9 +25,11 @@ actual class BleManager actual constructor() {
     actual fun disConnectToDevice(deviceId: String) {
     }
 
-    actual val readData: StateFlow<Pair<String, ByteArray>?>
+    actual val readDataResult: StateFlow<Pair<String, ByteArray>?>
         get() = TODO("Not yet implemented")
 
+    actual fun readBleData(serviceId: String, characteristicUuid: String) {
+    }
 
 
 }
