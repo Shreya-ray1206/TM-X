@@ -139,4 +139,9 @@ actual class BleManager actual constructor() : NSObject(), CBCentralManagerDeleg
             println("Disconnected from $deviceId")
         } ?: println("Device not found")
     }
+
+    actual val readData: StateFlow<Pair<String, ByteArray>?>
+        get() = TODO("Not yet implemented")
+
+
 }

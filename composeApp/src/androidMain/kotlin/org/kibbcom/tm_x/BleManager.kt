@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
+import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.BluetoothLeScanner
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.kibbcom.tm_x.ble.BleConnectionStatus
 import org.kibbcom.tm_x.ble.BleDeviceCommon
+import java.util.UUID
 
 actual class BleManager actual constructor() {
 
@@ -36,6 +38,8 @@ actual class BleManager actual constructor() {
     actual val connectionState = _connectionState.asStateFlow()
     private val _scanResults = MutableStateFlow<List<BleDeviceCommon>>(emptyList())
     actual val scanResults = _scanResults.asStateFlow()
+    private val _readData = MutableStateFlow<Pair<String, ByteArray>?>(null)
+    actual val readData = _readData.asStateFlow()
 
 
     private val bondReceiver = object : BroadcastReceiver() {
@@ -102,7 +106,7 @@ actual class BleManager actual constructor() {
     }
 
 
-
+    @OptIn(ExperimentalStdlibApi::class)
     @SuppressLint("MissingPermission")
     actual fun connectToDevice(deviceId: String) {
         val device = bluetoothAdapter?.getRemoteDevice(deviceId)
@@ -117,9 +121,9 @@ actual class BleManager actual constructor() {
             override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
                 when (newState) {
                     BluetoothProfile.STATE_CONNECTED -> {
-                        println("Connected to $deviceId")
-                        bluetoothGatt = gatt
+                        println("Connected to $deviceId, discovering services...")
                         _connectionState.value = BleConnectionStatus.CONNECTED
+                        bluetoothGatt = gatt
                         gatt.discoverServices()
                     }
 
@@ -133,11 +137,48 @@ actual class BleManager actual constructor() {
 
             override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
                 if (status == BluetoothGatt.GATT_SUCCESS) {
-                    println("Services discovered: ${gatt.services}")
+                    println("Services discovered successfully!")
+
+                    // 🔥 Print all available services and characteristics
+                    gatt.services.forEach { service ->
+                        println("Service: ${service.uuid}")
+
+                        service.characteristics.forEach { characteristic ->
+                            println(" - Characteristic: ${characteristic.uuid}")
+                        }
+                    }
+
+                    // 🔥 UUIDs for service and characteristic
+                    val serviceUuid = UUID.fromString("EC7B0001-EDFF-4CCE-9CF8-3B175487D710")
+                    val characteristicUuid = UUID.fromString("EC7B0004-EDFF-4CCE-9CF8-3B175487D710")
+
+                    readCharacteristic(serviceUuid, characteristicUuid)
+                } else {
+                    println("Failed to discover services, status: $status")
+                }
+            }
+
+            override fun onCharacteristicRead(
+                gatt: BluetoothGatt?,
+                characteristic: BluetoothGattCharacteristic?,
+                status: Int
+            ) {
+                if (status == BluetoothGatt.GATT_SUCCESS && characteristic != null) {
+                    val data = characteristic.value
+                    val characteristicUuid = characteristic.uuid
+                    _readData.value = characteristicUuid.toString() to data
+                    println("Read characteristic success! Data (HEX): ${data.toHexString()}")
+                    val dataString = data.toString(Charsets.UTF_8)
+                    println("Received Data as String: $dataString")
+                } else {
+                    println("Failed to read characteristic, status: $status")
                 }
             }
         })
     }
+
+
+
 
 
     @SuppressLint("MissingPermission")
@@ -173,6 +214,33 @@ actual class BleManager actual constructor() {
     }
 
     actual fun disConnectToDevice(deviceId: String) {
+    }
+
+
+    @SuppressLint("MissingPermission")
+    fun readCharacteristic(serviceUdid : UUID, characteristicUuid: UUID) {
+        println("BluetoothGatt Read method is called.")
+
+        val gatt = bluetoothGatt
+        if (gatt == null) {
+            println("BluetoothGatt is null, cannot read characteristic.")
+            return
+        }
+
+        val service = gatt.getService(serviceUdid)
+        if (service == null) {
+            println("Service with UUID $serviceUdid not found.")
+            return
+        }
+
+        val characteristic = service.getCharacteristic(characteristicUuid)
+        if (characteristic == null) {
+            println("Characteristic with UUID $characteristicUuid not found.")
+            return
+        }
+
+        val success = gatt.readCharacteristic(characteristic)
+        println("Read characteristic request sent: $success")
     }
 
 

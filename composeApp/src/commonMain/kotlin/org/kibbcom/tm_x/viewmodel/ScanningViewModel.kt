@@ -10,9 +10,9 @@ import kotlinx.coroutines.launch
 import org.kibbcom.tm_x.BleManager
 import org.kibbcom.tm_x.ble.BleConnectionStatus
 import org.kibbcom.tm_x.ble.BleDeviceCommon
-import org.kibbcom.tm_x.ble.BleManagerInstance
 
 
+@OptIn(ExperimentalStdlibApi::class)
 class ScanningViewModel() : ViewModel(){
     private val bleManager = BleManager()
 
@@ -36,6 +36,17 @@ class ScanningViewModel() : ViewModel(){
                 println("BLE Connection State Updated: $state")
             }
         }
+        viewModelScope.launch {
+            bleManager.readData.collectLatest { state ->
+                state?.let { (stringValue, byteArrayValue) ->
+
+                    println("Read Scanning viewmodel ! Data (HEX): ${byteArrayValue.toHexString()}")
+
+
+                }
+            }
+        }
+
     }
     fun scanDevices() {
         bleManager.scanDevices()
@@ -52,6 +63,7 @@ class ScanningViewModel() : ViewModel(){
     fun bondWithDevice(deviceId: String) {
         bleManager.bondWithDevice(deviceId)
     }
+
 
 }
 
