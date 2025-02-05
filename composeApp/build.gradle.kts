@@ -40,6 +40,7 @@ kotlin {
 
 
             implementation(libs.ktor.client.okhttp)
+            implementation("androidx.compose.material3:material3:1.2.0")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -66,7 +67,8 @@ kotlin {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
 
-
+            // ✅ Add Material 3 for Desktop
+            implementation("org.jetbrains.compose.material3:material3-desktop:1.5.0")
         }
 
         iosMain.dependencies {

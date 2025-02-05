@@ -1,9 +1,11 @@
 package org.kibbcom.tm_x
 
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -41,9 +44,14 @@ import androidx.compose.material.BottomAppBar
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.ExposedDropdownMenuBox
+import androidx.compose.material.ExposedDropdownMenuDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SwitchDefaults
+import androidx.compose.material.TextField
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -51,13 +59,14 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.lightColors
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import okio.FileSystem
 
 
 private val LightColorPalette = lightColors(
@@ -89,12 +98,37 @@ fun AppTheme(content: @Composable () -> Unit) {
 @Composable
 @Preview
 fun App(navigationState: NavigationState = remember { NavigationState() }) {
+
     AppTheme { // Apply the custom theme here
         Scaffold(
             topBar = {
                 TopAppBar(
                     title = {
-                        Text("Kibbcom TM-X", color = MaterialTheme.colors.onPrimary)
+                        Box(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 8.dp)
+                            ) {
+                                // App title
+                                Text(
+                                    text = "Kibbcom TM-X",
+                                    color = MaterialTheme.colors.onPrimary
+                                )
+
+                                Spacer(modifier = Modifier.width(210.dp)) // Adjust the width as needed
+
+                                AsyncImage(
+                                    model = "https://png.pngtree.com/element_our/20190529/ourmid/pngtree-wifi-network-signal-gradient-color-sign-image_1188576.jpg",
+                                    contentDescription = "App Icon",
+                                    modifier = Modifier
+                                        .size(28.dp) // Small size for the icon
+                                        .clip(CircleShape) // Makes the image circular
+                                        .background(color = Color.Black)
+                                )
+                            }
+                        }
                     },
                     backgroundColor = Color(0xFF373737), // Black
                     actions = {
@@ -105,9 +139,9 @@ fun App(navigationState: NavigationState = remember { NavigationState() }) {
             bottomBar = {
                 BottomAppBar(
                     backgroundColor =  Color(0xFF373737),
-                    contentColor = MaterialTheme.colors.onPrimary // White icons
+                    contentColor = MaterialTheme.colors.onPrimary
                 ) {
-                    // Bottom bar content (e.g., navigation icons)
+
                     Footer(navigationState)
                 }
             }
@@ -127,17 +161,21 @@ fun App(navigationState: NavigationState = remember { NavigationState() }) {
 fun DeviceStatusIndicator(isConnected: Boolean) {
     val color = if (isConnected) Color(0xFF88D66C) else Color.Gray
 
-    Icon(
-        imageVector = Icons.Default.Check,
-        contentDescription = "Connection Status", // Provide a meaningful description
-        tint = color, // Apply the conditional color here
-        modifier = Modifier.size(24.dp) // Set the size of the icon
-    )
+
+//    val iconPainter = painterResource(resource = R.drawable.app_icon)
+
+     //Display the custom icon
+//    Image(
+//        painter = iconPainter,
+//        contentDescription = "Connection Status",
+//        modifier = Modifier.size(24.dp),
+//        colorFilter = ColorFilter.tint(color)
+//    )
 }
 
 @Composable
 fun Footer(navigationState: NavigationState){
-    val items = listOf(Screen.Device, Screen.Beacon)
+    val items = listOf(Screen.Device, Screen.Beacon, Screen.Settings)
     val selectedItem = navigationState.currentScreen
 
     BottomNavigation(
@@ -149,6 +187,7 @@ fun Footer(navigationState: NavigationState){
                     when (screen) {
                         is Screen.Device -> Icon(Icons.Default.Home, contentDescription = screen.toString())
                         is Screen.Beacon -> Icon(Icons.Default.LocationOn, contentDescription = screen.toString())
+                        is Screen.Settings -> Icon(Icons.Default.Settings, contentDescription = screen.toString())
                     }
                 },
                 label = { Text(screen.toString()) },
@@ -167,6 +206,8 @@ fun Navigation(navigationState: NavigationState, modifier: Modifier = Modifier) 
     when (navigationState.currentScreen) {
         is Screen.Device -> DeviceScreen()
         is Screen.Beacon -> BeaconScreen()
+        is Screen.Settings -> SettingsScreen()
+
     }
 }
 //
@@ -199,16 +240,17 @@ fun Header() {
     Column (
         modifier = Modifier
             .fillMaxWidth()
+            .wrapContentSize()
             .padding(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally, // Center the items horizontally
-        verticalArrangement = Arrangement.Center // Center the items vertically
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
         AsyncImage(
             model = "https://png.pngtree.com/background/20230527/original/pngtree-hd-headphone-on-black-background-with-pink-and-bright-blue-lights-picture-image_2760698.jpg",
             contentDescription = "im",
             modifier = Modifier
-                .size(240.dp) // Size of the image
-                .clip(CircleShape) // Makes the image circular
+                .size(100.dp)
+                .clip(CircleShape)
                 .background(color = Color.Black)
         )
         Spacer(modifier = Modifier.height(15.dp))
@@ -256,8 +298,8 @@ data class Device(
 @Composable
 fun DeviceScreen() {
     val devices = listOf(
-        Device(1, "JBL Flip 5", "E8:53:F3:51:94:97", "-82 dB", true, false),
-        Device(2, "Sony WH-1000XM4", "A4:C3:F0:22:15:8E", "-75 dB", true, true),
+        Device(1, "JBL Flip 5", "E8:53:F3:51:94:97", "-82 dB", true, true),
+        Device(2, "Sony WH-1000XM4", "A4:C3:F0:22:15:8E", "-75 dB", true, false),
         Device(3, "Apple AirPods Pro", "B2:45:67:89:10:AB", "-90 dB", false, false),
         Device(4, "Samsung Galaxy Buds Pro", "C3:D4:E5:F6:12:34", "-68 dB", true, false),
         Device(5, "Bose QuietComfort 35 II", "D5:E6:F7:18:29:3A", "-95 dB", false, true),
@@ -393,12 +435,214 @@ fun DeviceItem(device: Device) {
     }
 }
 
+
+
 @Composable
 fun BeaconScreen() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+    var isBeaconEnabled by remember { mutableStateOf(true) }
+    var isScanning by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }
+    var selectedType by remember { mutableStateOf("Choose Type") }
+
+    // Sample data for beacon devices
+    val beaconDevices = remember {
+        listOf(
+            BeaconDevice("Sony JBL","12:90:889","Bsi23",563359987, 988989,true ),
+            BeaconDevice("TM-X","12:90:889","Bsi23",563359987, 988989, false),
+            BeaconDevice("Sony JBL","12:90:889","Bsi23",563359987, 988989, true),
+            BeaconDevice("TM-X","12:90:889","Bsi23",563359987, 988989, true)
+        )
+    }
+
+    Column (
+       modifier = Modifier
+           .fillMaxSize()
+           .padding(16.dp)
     ) {
-        Text("Beacon Screen", fontSize = 24.sp)
+        // Beacon Control Card
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            backgroundColor = MaterialTheme.colors.surface,
+            border = BorderStroke(1.dp, CardBorderColor),
+            shape = RoundedCornerShape(18.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .background(color = Color.Transparent),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+
+                    AsyncImage(
+                        model = "https://images-platform.99static.com//CSsrGrz0M4afBGYk1e3W1iMEa6c=/1759x1132:2800x2173/fit-in/500x500/projects-files/160/16075/1607511/37cfbdae-164c-4d70-884f-c3d629db72c0.png",
+                        contentDescription = "beacon",
+                        modifier = Modifier
+                            .size(50.dp) // Size of the image
+                            .clip(RoundedCornerShape(10))
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(
+                        text = "Beacon",
+                        style = MaterialTheme.typography.h6,
+                        color = MaterialTheme.colors.onSurface
+                    )
+                }
+
+                Switch(
+                    checked = isBeaconEnabled,
+                    onCheckedChange = { isBeaconEnabled = it },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colors.secondary,
+                        checkedTrackColor = MaterialTheme.colors.secondary.copy(alpha = 0.5f),
+                        uncheckedThumbColor = Color.Gray,
+                        uncheckedTrackColor = Color.LightGray
+                    )
+                )
+            }
+        }
+
+        if (isScanning) {
+            Button(
+                onClick = { isScanning = false },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = MaterialTheme.colors.secondary,
+                    contentColor = Color.White
+                )
+            ) {
+                Text("Stop Scanning")
+            }
+        }
+
+        // Buttons for type selection
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Button(
+                onClick = { selectedType = "Eddy Stone" },
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = if (selectedType == "Eddy Stone") MaterialTheme.colors.primary else MaterialTheme.colors.surface
+                )
+            ) {
+                Text("Eddy Stone")
+            }
+
+            Button(
+                onClick = { selectedType = "Beacon" },
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = if (selectedType == "Beacon") MaterialTheme.colors.primary else MaterialTheme.colors.surface
+                )
+            ) {
+                Text("Beacon")
+            }
+        }
+
+        // Beacon List
+        Column(modifier = Modifier.fillMaxSize().padding(vertical = 8.dp)) {
+            beaconDevices.forEach { beacon ->
+                BeaconItem(beacon = beacon)
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+
+
     }
 }
+
+data class BeaconDevice(
+    val name: String,
+    val macAddress: String,
+    val rssi: String,
+    val major: Int,
+    val minor: Int,
+    val isSaved :Boolean
+)
+
+@Composable
+fun BeaconItem(beacon: BeaconDevice) {
+    var isSaved by remember { mutableStateOf(false) }
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+//        colors = CardDefaults.cardColors(
+//            containerColor = MaterialTheme.colorScheme.surface,
+//        ),
+        border = BorderStroke(1.dp, Color.Gray),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = beacon.name,
+                style = MaterialTheme.typography.subtitle2,
+                color = MaterialTheme.colors.onSurface
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Mac Address : ${beacon.macAddress}",
+                    style = MaterialTheme.typography.subtitle2,
+                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = "Rssi : ${ beacon.rssi}",
+                    style = MaterialTheme.typography.subtitle2,
+                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.End
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row() {
+                Text(
+                    text = "Major : ${beacon.major} Minor : ${beacon.minor}",
+                    style = MaterialTheme.typography.subtitle2,
+                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+                    modifier = Modifier.weight(1f)
+                )
+
+                Spacer(modifier = Modifier.width(70.dp))
+
+                Box(
+                    modifier = Modifier.weight(1f),
+                    contentAlignment = Alignment.CenterEnd
+                ) {
+                    Button(
+
+                        onClick = {
+                            isSaved = true
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color(0xFF88D66C)
+                        ),
+                        shape = RoundedCornerShape(5.dp)
+                    ) {
+                        Text(text = "Save", color = Color.White)
+                    }
+                }
+            }
+        }
+    }
+}
+
