@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
@@ -23,25 +24,39 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.ktor.utils.io.core.toByteArray
 import kotlinx.coroutines.delay
+import org.kibbcom.tm_x.NavigationNewState
 import org.kibbcom.tm_x.ScanningViewModelFactory
+import org.kibbcom.tm_x.Screen
 import org.kibbcom.tm_x.ble.BleConnectionStatus
+import org.kibbcom.tm_x.platform.BackHandler
 import org.kibbcom.tm_x.viewmodel.ScanningViewModel
 
+
 @Composable
-fun BleScanningScreen(viewModel: ScanningViewModel = viewModel(factory = ScanningViewModelFactory())) {
+fun BleScanningScreen(  navigationState: NavigationNewState,viewModel: ScanningViewModel = viewModel(factory = ScanningViewModelFactory())) {
     Column(
         modifier = Modifier
             .fillMaxSize(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val devicesNative by viewModel.devicesNative.collectAsState()
-        val connectionState by viewModel.connectionState.collectAsState()
+
+        BackHandler {
+            navigationState.navigateBack()  // Handle back press
+        }
+
 
         // Start scanning when the screen is composed
         LaunchedEffect(Unit) {
             viewModel.scanDevices()
         }
+
+        val devicesNative by viewModel.devicesNative.collectAsState()
+        val connectionState by viewModel.connectionState.collectAsState()
+
+
+
+
 
         LaunchedEffect(connectionState){
             println("Screen Device got connected")
@@ -84,8 +99,12 @@ fun BleScanningScreen(viewModel: ScanningViewModel = viewModel(factory = Scannin
             items(devicesNative) { device ->
                 Card(
                     modifier = Modifier.fillMaxWidth().padding(8.dp).clickable {
-                        viewModel.stopScanningDevice()
-                        viewModel.bondWithDevice(device.id)
+
+                        navigationState.navigateTo(Screen.DummyScreen)
+
+//                        //todo for scanning
+//                        viewModel.stopScanningDevice()
+//                        viewModel.bondWithDevice(device.id)
                     },
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {

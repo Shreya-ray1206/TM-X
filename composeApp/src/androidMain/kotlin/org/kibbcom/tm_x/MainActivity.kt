@@ -12,7 +12,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            App(navigationState = remember { NavigationState() })
+            App(navigationState = remember { NavigationNewState() })
         }
     }
 }
