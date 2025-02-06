@@ -143,6 +143,7 @@ fun MainScreen(navigationState: NavigationState) {
                         Button(onClick = {
                             navigationState.navigateTo(Screen.BleScanning) // Navigate to next screen
                         }) {
+                            Spacer(modifier = Modifier.height(50.dp))
                             Text("Scan Devices")
                         }
                     }
@@ -158,6 +159,7 @@ fun MainScreen(navigationState: NavigationState) {
 
                     // Handle case where permissions are not granted or denied
                     else -> {
+                        Spacer(modifier = Modifier.height(50.dp))
                         Button(onClick = { viewModel.provideOrRequestBLEPermissions() }) {
                             Text("Request BLE permissions")
                         }

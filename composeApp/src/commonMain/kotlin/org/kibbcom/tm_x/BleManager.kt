@@ -15,5 +15,6 @@ expect class BleManager() {
     fun disConnectToDevice(deviceId: String)
     fun bondWithDevice(deviceId: String)
     fun readBleData(serviceId : String, characteristicUuid : String)
+    fun writeBleData(serviceId: String, characteristicId: String, data: ByteArray)
 }
 

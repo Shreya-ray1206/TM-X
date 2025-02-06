@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.ktor.utils.io.core.toByteArray
 import kotlinx.coroutines.delay
 import org.kibbcom.tm_x.ScanningViewModelFactory
 import org.kibbcom.tm_x.ble.BleConnectionStatus
@@ -49,9 +50,17 @@ fun BleScanningScreen(viewModel: ScanningViewModel = viewModel(factory = Scannin
                 println("Screen Device read method called connected")
 
                 val serviceUuid ="EC7B0001-EDFF-4CCE-9CF8-3B175487D710"
-                val characteristicUuid = "EC7B0004-EDFF-4CCE-9CF8-3B175487D710"
+               // val characteristicUuid = "EC7B0004-EDFF-4CCE-9CF8-3B175487D710"
 
-                viewModel.readBleData(serviceUuid,characteristicUuid)
+                //Read and write Wifi Ssid (Read)
+                 val WIFI_SSID = "EC7B0004-EDFF-4CCE-9CF8-3B175487D710"
+
+                 val PASSWORD = "EC7B0005-EDFF-4CCE-9CF8-3B175487D710"
+
+          //      viewModel.readBleData(serviceUuid,characteristicUuid)
+                viewModel.writeBleData(serviceUuid,WIFI_SSID,"neeraj".toByteArray())
+                delay(4000)
+                viewModel.writeBleData(serviceUuid,PASSWORD,"vbvm8893".toByteArray())
             }
         }
 

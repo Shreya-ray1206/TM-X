@@ -31,5 +31,12 @@ actual class BleManager actual constructor() {
     actual fun readBleData(serviceId: String, characteristicUuid: String) {
     }
 
+    actual fun writeBleData(
+        serviceId: String,
+        characteristicId: String,
+        data: ByteArray
+    ) {
+    }
+
 
 }

@@ -146,5 +146,12 @@ actual class BleManager actual constructor() : NSObject(), CBCentralManagerDeleg
     actual fun readBleData(serviceId: String, characteristicUuid: String) {
     }
 
+    actual fun writeBleData(
+        serviceId: String,
+        characteristicId: String,
+        data: ByteArray
+    ) {
+    }
+
 
 }

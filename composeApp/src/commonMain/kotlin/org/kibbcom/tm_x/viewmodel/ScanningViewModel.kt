@@ -68,6 +68,10 @@ class ScanningViewModel() : ViewModel(){
         bleManager.readBleData(serviceId,characteristicUuid)
     }
 
+    fun writeBleData(serviceId: String, characteristicId: String, data: ByteArray){
+        bleManager.writeBleData(serviceId,characteristicId,data)
+    }
+
 
 }
 

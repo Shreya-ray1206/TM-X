@@ -213,7 +213,12 @@ actual class BleManager actual constructor() {
         scanner?.stopScan(scanCallback)
     }
 
+    @SuppressLint("MissingPermission")
     actual fun disConnectToDevice(deviceId: String) {
+        bluetoothGatt?.disconnect()
+        bluetoothGatt?.close()
+        bluetoothGatt = null
+        _connectionState.value = BleConnectionStatus.DISCONNECTED
     }
 
 
@@ -247,6 +252,42 @@ actual class BleManager actual constructor() {
         println("Read characteristic request sent: $success")
 
     }
+
+    @SuppressLint("MissingPermission")
+    actual fun writeBleData(serviceId: String, characteristicId: String, data: ByteArray) {
+        val gatt = bluetoothGatt
+        if (gatt == null) {
+            println("BluetoothGatt is null, cannot write characteristic.")
+            return
+        }
+
+        val service = gatt.getService(UUID.fromString(serviceId))
+        if (service == null) {
+            println("Service with UUID $serviceId not found.")
+            return
+        }
+
+        val characteristic = service.getCharacteristic(UUID.fromString(characteristicId))
+        if (characteristic == null) {
+            println("Characteristic with UUID $characteristicId not found.")
+            return
+        }
+
+        // Check if the characteristic supports writing
+        val writeProperty = characteristic.properties and BluetoothGattCharacteristic.PROPERTY_WRITE
+        val writeNoResponseProperty = characteristic.properties and BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE
+
+        if (writeProperty == 0 && writeNoResponseProperty == 0) {
+            println("Characteristic does not support writing.")
+            return
+        }
+
+        characteristic.value = data
+
+        val success = gatt.writeCharacteristic(characteristic)
+        println("Write characteristic request sent: $success")
+    }
+
 
 
 }
