@@ -1,4 +1,4 @@
-package org.kibbcom.tm_x
+package org.kibbcom.tm_x.platform
 
 import androidx.lifecycle.ViewModelProvider
 

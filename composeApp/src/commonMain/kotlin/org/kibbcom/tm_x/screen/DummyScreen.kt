@@ -15,11 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.kibbcom.tm_x.NavigationNewState
+import org.kibbcom.tm_x.Screen
 import org.kibbcom.tm_x.platform.BackHandler
 
-
 @Composable
-fun SettingsScreen(navigationState: NavigationNewState,paddingValues : PaddingValues) {
+fun DummyScreen(navigationState: NavigationNewState, paddingValues : PaddingValues) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -33,7 +33,7 @@ fun SettingsScreen(navigationState: NavigationNewState,paddingValues : PaddingVa
             navigationState.navigateBack()  // Handle back press
         }
 
-        Text("This is my setiings screen ", color = Color.White)
+        Text("This is my Dummy screen ", color = Color.White)
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -42,8 +42,4 @@ fun SettingsScreen(navigationState: NavigationNewState,paddingValues : PaddingVa
         }
     }
 }
-
-
-
-
 

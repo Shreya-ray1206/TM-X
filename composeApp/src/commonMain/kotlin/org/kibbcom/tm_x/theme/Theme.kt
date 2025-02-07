@@ -5,7 +5,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import org.kibbcom.tm_x.platform.setStatusBarColor
 
 @Composable
@@ -15,23 +14,25 @@ fun TmxAppTheme(
 ) {
     val colors = if (darkTheme) {
         darkColorScheme(
-            primary = primaryGrey,
+            primary = darkPrimaryGrey,
             secondary = secondaryGrey,
-            background = primaryDarkGray,
-            surface = card
+            background = darkBackground,
+            surface = darkSurface
         )
     } else {
         lightColorScheme(
-            primary = green,  // Green top bar
-            secondary = secondaryGrey,
-            background = primaryLightGray,
+            primary = lightPrimaryBlue,  // Green top bar
+            secondary = lightDarkBlue,
+            background = lightAppBackGround,
+            surface = lightSurface
+
 
         )
     }
 
     // Set Status Bar color for Android
     setStatusBarColor(
-        color = if (darkTheme) black else darkGreen,
+        color = if (darkTheme) black else lightDarkBlue,
         isDarkIcons = !darkTheme
     )
 

@@ -20,7 +20,7 @@ import android.os.Looper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.kibbcom.tm_x.ble.BleConnectionStatus
-import org.kibbcom.tm_x.ble.BleDeviceCommon
+import org.kibbcom.tm_x.models.BleDeviceCommon
 import java.util.UUID
 
 actual class BleManager actual constructor() {

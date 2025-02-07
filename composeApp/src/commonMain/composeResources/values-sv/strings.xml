@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+
+    <string name="scan_devices">Skanna enheter</string>
+    <string name="scanning">Skannar</string>
+    <string name="beacon">Fyr</string>
+    <string name="settings">Inställningar</string>
+    <string name="ble_devices">BLE-enheter</string>
+    <string name="beacon_devices">Fyr-enheter</string>
+</resources>

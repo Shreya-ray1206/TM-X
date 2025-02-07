@@ -17,9 +17,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.icerock.moko.permissions.PermissionState
 import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
+import org.jetbrains.compose.resources.stringResource
 import org.kibbcom.tm_x.NavigationNewState
 import org.kibbcom.tm_x.Screen
 import org.kibbcom.tm_x.viewmodel.PermissionsViewModel
+import tm_x.composeapp.generated.resources.Res
+import tm_x.composeapp.generated.resources.scan_devices
 
 
 @Composable
@@ -51,12 +54,11 @@ fun PermissionScreen(navigationState: NavigationNewState) {
                     viewModel.bleConnectPermissionState == PermissionState.Granted -> {
                 Text("BLE permissions granted!")
                 Button(onClick = {
-                    navigationState.showBottomBar = true
-                    navigationState.clearStack()
+
                     navigationState.navigateTo(Screen.BleScanning) // Navigate to next screen
                 }) {
                     Spacer(modifier = Modifier.height(50.dp))
-                    Text("Scan Devices")
+                    Text(stringResource(Res.string.scan_devices))
                 }
             }
 

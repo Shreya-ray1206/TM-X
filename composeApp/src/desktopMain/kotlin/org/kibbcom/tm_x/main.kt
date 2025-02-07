@@ -9,6 +9,6 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "TMX",
     ) {
-        App(navigationState = remember { NavigationState() })
+        App(navigationState = remember { NavigationNewState() })
     }
 }

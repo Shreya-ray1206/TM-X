@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.kibbcom.tm_x.ble.BleConnectionStatus
-import org.kibbcom.tm_x.ble.BleDeviceCommon
+import org.kibbcom.tm_x.models.BleDeviceCommon
 import platform.CoreBluetooth.CBCentralManager
 import platform.CoreBluetooth.CBCentralManagerDelegateProtocol
 import platform.CoreBluetooth.CBManagerStatePoweredOn

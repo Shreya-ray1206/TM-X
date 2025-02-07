@@ -2,7 +2,7 @@ package org.kibbcom.tm_x
 
 import kotlinx.coroutines.flow.StateFlow
 import org.kibbcom.tm_x.ble.BleConnectionStatus
-import org.kibbcom.tm_x.ble.BleDeviceCommon
+import org.kibbcom.tm_x.models.BleDeviceCommon
 
 expect class BleManager() {
     val scanResults: StateFlow<List<BleDeviceCommon>>

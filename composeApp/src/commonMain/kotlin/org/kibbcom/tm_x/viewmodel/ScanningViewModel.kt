@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.kibbcom.tm_x.BleManager
 import org.kibbcom.tm_x.ble.BleConnectionStatus
-import org.kibbcom.tm_x.ble.BleDeviceCommon
+import org.kibbcom.tm_x.models.BleDeviceCommon
 
 
 @OptIn(ExperimentalStdlibApi::class)

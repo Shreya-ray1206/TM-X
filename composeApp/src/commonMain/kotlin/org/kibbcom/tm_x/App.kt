@@ -5,7 +5,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -13,61 +12,46 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.kibbcom.tm_x.screen.BeaconScreen
 import org.kibbcom.tm_x.screen.BleScanningScreen
+import org.kibbcom.tm_x.screen.CustomTopBar
+import org.kibbcom.tm_x.screen.DummyScreen
 import org.kibbcom.tm_x.screen.PermissionScreen
 import org.kibbcom.tm_x.screen.SettingsScreen
 import org.kibbcom.tm_x.theme.TmxAppTheme
-import org.kibbcom.tm_x.theme.green
+import org.kibbcom.tm_x.theme.lightPrimaryBlue
 import org.kibbcom.tm_x.theme.primaryWhite
+import tm_x.composeapp.generated.resources.Res
+import tm_x.composeapp.generated.resources.beacon_devices
+import tm_x.composeapp.generated.resources.ble_devices
+import tm_x.composeapp.generated.resources.settings
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
 fun App(navigationState: NavigationNewState = remember { NavigationNewState() }) {
-    if (navigationState.showBottomBar) {
-        TmxAppTheme { // Apply the custom theme here
-
-            Scaffold(
-                topBar = {
-                    TopAppBar(
-                        title = {
-                            Text(
-                                text = getScreenTitle(navigationState.currentScreen),
-                                color = primaryWhite
-                            )
-                        },
-                        colors = TopAppBarDefaults.mediumTopAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        ),
-                        windowInsets = TopAppBarDefaults.windowInsets
-                    )
-                },
-                bottomBar = { BottomNavigationBar(navigationState) }
-            ) { paddingValues ->  // Capture padding from Scaffold
-                when (navigationState.currentScreen) {
-                    is Screen.BleScanning -> BleScanningScreen(navigationState, paddingValues)
-                    is Screen.Beacon -> BeaconScreen(navigationState, paddingValues)
-                    is Screen.Settings -> SettingsScreen(navigationState, paddingValues)
-                    else -> {}
+    TmxAppTheme { // Apply the custom theme here
+        Scaffold(
+            topBar = { CustomTopBar(navigationState) },
+            bottomBar = {
+                if (navigationState.showBottomBar) {
+                    BottomNavigationBar(navigationState)
                 }
             }
-
-
-
+        ) { paddingValues ->  // Capture padding from Scaffold
+            when (navigationState.currentScreen) {
+                is Screen.BleScanning -> BleScanningScreen(navigationState, paddingValues)
+                is Screen.Beacon -> BeaconScreen(navigationState, paddingValues)
+                is Screen.Settings -> SettingsScreen(navigationState, paddingValues)
+                is Screen.Permission -> PermissionScreen(navigationState)
+                is Screen.DummyScreen -> DummyScreen(navigationState,paddingValues)
+                else -> {}
+            }
         }
-    }else{
-        PermissionScreen(navigationState)
-
     }
-
-
-
 }
 
 
@@ -95,9 +79,9 @@ fun BottomNavigationBar(navigationState: NavigationNewState) {
                 },
                 label = {
                     Text(
-                        screen.toString(),
+                        getNameTitle(screen),
                         color = if (navigationState.currentScreen == screen) {
-                            if (isDarkTheme) primaryWhite else green
+                            if (isDarkTheme) primaryWhite else lightPrimaryBlue
                         } else {
                             MaterialTheme.colorScheme.onSurfaceVariant
                         }
@@ -115,17 +99,17 @@ fun BottomNavigationBar(navigationState: NavigationNewState) {
     }
 }
 
-
 @Composable
-fun getScreenTitle(screen: Screen): String {
+fun getNameTitle(screen: Screen): String {
     return when (screen) {
-        is Screen.Device -> "TMX-Kibbcom" // First screen default title
-        is Screen.Beacon -> "Beacon Devices"
-        is Screen.BleScanning -> "Scanning Devices"
-        is Screen.Settings -> "Settings"
+
+        is Screen.Beacon -> stringResource(Res.string.beacon_devices)
+        is Screen.BleScanning -> stringResource(Res.string.ble_devices)
+        is Screen.Settings -> stringResource(Res.string.settings)
         else -> "TMX-Kibbcom"
     }
 }
+
 
 
 

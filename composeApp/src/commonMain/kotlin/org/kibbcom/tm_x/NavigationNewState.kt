@@ -1,15 +1,15 @@
 package org.kibbcom.tm_x
 
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 
 class NavigationNewState {
 
-    private val _screenStack = mutableStateListOf<Screen>(Screen.Device)
+    private val _screenStack = mutableStateListOf<Screen>(Screen.Permission)
     val currentScreen: Screen get() = _screenStack.last()
-    var showBottomBar: Boolean by mutableStateOf(false) // Initially hidden
+
+    val showBottomBar: Boolean
+        get() = currentScreen in listOf(Screen.BleScanning, Screen.Beacon, Screen.Settings)
+
 
     fun navigateTo(screen: Screen) {
         _screenStack.add(screen)
@@ -25,7 +25,5 @@ class NavigationNewState {
             _screenStack.removeAt(_screenStack.size - 1) // Safe alternative
         }
     }
-
-
 }
 
