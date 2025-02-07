@@ -22,9 +22,10 @@ sealed class Screen {
         override fun toString(): String = "Beacon"
     }
     object BleScanning : Screen(){
-        override fun toString(): String = "BleScanningScreen"
+        override fun toString(): String = "Scanning"
     }
-    object DummyScreen : Screen(){
-        override fun toString(): String = "DummyScreen"
+    object Settings : Screen(){
+        override fun toString(): String = "Settings"
     }
+
 }

@@ -5,15 +5,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.Button
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import dev.icerock.moko.permissions.Permission
 import dev.icerock.moko.permissions.PermissionState
 import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
@@ -42,12 +42,17 @@ fun PermissionScreen(navigationState: NavigationNewState) {
     horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
+        Spacer(modifier = Modifier.height(50.dp))
+
+
         when {
             // Check if both Bluetooth permissions are granted
             viewModel.bleScanPermissionState == PermissionState.Granted &&
                     viewModel.bleConnectPermissionState == PermissionState.Granted -> {
                 Text("BLE permissions granted!")
                 Button(onClick = {
+                    navigationState.showBottomBar = true
+                    navigationState.clearStack()
                     navigationState.navigateTo(Screen.BleScanning) // Navigate to next screen
                 }) {
                     Spacer(modifier = Modifier.height(50.dp))

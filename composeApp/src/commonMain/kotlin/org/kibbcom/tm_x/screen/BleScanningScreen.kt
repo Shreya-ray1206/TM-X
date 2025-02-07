@@ -3,6 +3,7 @@ package org.kibbcom.tm_x.screen
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,9 +11,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Button
-import androidx.compose.material.Text
+
 import androidx.compose.material3.Card
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -33,10 +34,10 @@ import org.kibbcom.tm_x.viewmodel.ScanningViewModel
 
 
 @Composable
-fun BleScanningScreen(  navigationState: NavigationNewState,viewModel: ScanningViewModel = viewModel(factory = ScanningViewModelFactory())) {
+fun BleScanningScreen(navigationState: NavigationNewState, paddingValues: PaddingValues, viewModel: ScanningViewModel = viewModel(factory = ScanningViewModelFactory())) {
     Column(
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize() .padding(paddingValues),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -79,7 +80,7 @@ fun BleScanningScreen(  navigationState: NavigationNewState,viewModel: ScanningV
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+
 
         Text(
             text = when (connectionState) {
@@ -100,7 +101,7 @@ fun BleScanningScreen(  navigationState: NavigationNewState,viewModel: ScanningV
                 Card(
                     modifier = Modifier.fillMaxWidth().padding(8.dp).clickable {
 
-                        navigationState.navigateTo(Screen.DummyScreen)
+//                        navigationState.navigateTo(Screen.DummyScreen)
 
 //                        //todo for scanning
 //                        viewModel.stopScanningDevice()

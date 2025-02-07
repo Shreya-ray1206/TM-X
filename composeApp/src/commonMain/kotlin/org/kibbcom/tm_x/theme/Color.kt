@@ -11,12 +11,24 @@ val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCF94DA)
 
 
-val primaryGrey = Color(0xFF333333)
+val primaryGrey = Color(0xFF202020)
 val secondaryGrey = Color(0xFF433E44)
 val black = Color(0xFF000000)
 val primaryWhite = Color(0xFFFAFAFA)
 val primaryLightGray = Color(0xFF8E9090)
 val primaryDarkGray = Color(0xFF121212)
+
+
+val toolbar = Color(0xFF202020)
+val appbackground = Color(0xFF303030)
+val card = Color(0xFF424242)
+val cardLight = Color(0xFF555555)
+
+val darkGreen = Color(0xFF1e81b0)
+val green = Color(0xFF0694d7)
+
+
+
 
 val accentGrey: Color = Color(0xFF252525)
 val secGrey: Color = Color(0xFF433E44)
