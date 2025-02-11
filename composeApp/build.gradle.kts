@@ -1,7 +1,4 @@
-import org.gradle.kotlin.dsl.support.kotlinCompilerOptions
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -39,11 +36,11 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
-            implementation("androidx.core:core-ktx:1.15.0")
-            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
+            implementation(libs.androidx.core.ktx)
+            implementation(libs.kotlinx.coroutines.android)
             implementation(libs.ktor.client.okhttp)
-            implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0") // Android-only
-            implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.0") // Android-only
+            implementation(libs.androidx.lifecycle.viewmodel.compose) // Android-only
+            implementation(libs.androidx.lifecycle.runtime.ktx) // Android-only
         }
 
         commonMain.dependencies {
@@ -65,8 +62,8 @@ kotlin {
             api(libs.moko.permissions)
             api(libs.moko.permissions.compose)
 
-            implementation("androidx.core:core-ktx:1.15.0")
-            api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
+            implementation(libs.androidx.core.ktx)
+            api(libs.kotlinx.coroutines.core)
         }
 
         desktopMain.dependencies {
