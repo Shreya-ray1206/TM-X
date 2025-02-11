@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -38,7 +37,6 @@ fun PermissionScreen(navigationState: NavigationNewState) {
         PermissionsViewModel(controller)
     }
 
-
     Column(
     modifier = Modifier.fillMaxSize(),
     verticalArrangement = Arrangement.Top,
@@ -49,15 +47,14 @@ fun PermissionScreen(navigationState: NavigationNewState) {
 
 
         when {
-            // Check if both Bluetooth permissions are granted
+
             viewModel.bleScanPermissionState == PermissionState.Granted &&
                     viewModel.bleConnectPermissionState == PermissionState.Granted -> {
                 Text("BLE permissions granted!")
+                Spacer(modifier = Modifier.height(50.dp))
                 Button(onClick = {
-
                     navigationState.navigateTo(Screen.BleScanning) // Navigate to next screen
                 }) {
-                    Spacer(modifier = Modifier.height(50.dp))
                     Text(stringResource(Res.string.scan_devices))
                 }
             }
@@ -66,10 +63,10 @@ fun PermissionScreen(navigationState: NavigationNewState) {
             viewModel.bleScanPermissionState == PermissionState.DeniedAlways ||
                     viewModel.bleConnectPermissionState == PermissionState.DeniedAlways -> {
                 Text("One or both BLE permissions were permanently declined.")
+                Spacer(modifier = Modifier.height(50.dp))
+
                 Button(onClick = {
-
                     controller.openAppSettings()
-
                 }) {
                     Text("Open app settings")
                 }
@@ -77,6 +74,7 @@ fun PermissionScreen(navigationState: NavigationNewState) {
 
             // Handle case where permissions are not granted or denied
             else -> {
+                Spacer(modifier = Modifier.height(50.dp))
                 Spacer(modifier = Modifier.height(50.dp))
                 Button(onClick = { viewModel.provideOrRequestBLEPermissions() }) {
                     Text("Request BLE permissions")

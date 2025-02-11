@@ -14,35 +14,6 @@ import dev.icerock.moko.permissions.RequestCanceledException
 import kotlinx.coroutines.launch
 
 
-/*class PermissionsViewModel (
-    private val controller: PermissionsController
-): ViewModel() {
-
-     var blePermissionState by mutableStateOf(PermissionState.NotDetermined)
-
-    init {
-        viewModelScope.launch {
-            blePermissionState = controller.getPermissionState(Permission.BLUETOOTH_SCAN)
-        }
-    }
-
-    fun provideOrRequestBLEPermission() {
-        viewModelScope.launch {
-            try {
-                controller.providePermission(Permission.BLUETOOTH_SCAN)
-                blePermissionState = PermissionState.Granted
-            } catch (e: DeniedAlwaysException) {
-                blePermissionState = PermissionState.DeniedAlways
-            } catch (e: DeniedException) {
-                blePermissionState = PermissionState.Denied
-            } catch (e: RequestCanceledException) {
-                e.printStackTrace()
-            }
-        }
-    }
-}*/
-
-
 class PermissionsViewModel(
     private val controller: PermissionsController
 ) : ViewModel() {
