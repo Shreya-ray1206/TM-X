@@ -36,6 +36,8 @@ class ScanningViewModel() : ViewModel(){
                 println("BLE Connection State Updated: $state")
             }
         }
+        /*
+        //todo ios crashing here
         viewModelScope.launch {
             bleManager.readDataResult.collectLatest { state ->
                 state?.let { (stringValue, byteArrayValue) ->
@@ -46,7 +48,7 @@ class ScanningViewModel() : ViewModel(){
                 }
             }
         }
-
+*/
     }
     fun scanDevices() {
         bleManager.scanDevices()
