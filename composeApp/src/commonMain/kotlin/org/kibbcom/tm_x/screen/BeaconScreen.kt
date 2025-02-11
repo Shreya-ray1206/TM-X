@@ -31,6 +31,8 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,6 +49,7 @@ import org.kibbcom.tm_x.NavigationNewState
 import org.kibbcom.tm_x.Screen
 import org.kibbcom.tm_x.models.BeaconDevice
 import org.kibbcom.tm_x.platform.BackHandler
+import org.kibbcom.tm_x.platform.getTmxDatabase
 import org.kibbcom.tm_x.theme.CardBorderColor
 import tm_x.composeapp.generated.resources.Res
 
@@ -63,24 +66,42 @@ fun BeaconScreen(  navigationState: NavigationNewState,paddingValues: PaddingVal
     ) {
 
 
+        val dao = getTmxDatabase().beaconDao();
+
+        val people by dao.getAllPeople().collectAsState(initial = emptyList())
+
         BackHandler {
             navigationState.navigateBack()  // Handle back press
         }
 
+        println( "All the saved data $people")
         var isBeaconEnabled by remember { mutableStateOf(true) }
         var isScanning by remember { mutableStateOf(false) }
         var expanded by remember { mutableStateOf(false) }
         var selectedType by remember { mutableStateOf("Choose Type") }
 
         // Sample data for beacon devices
+
         val beaconDevices = remember {
             listOf(
-                BeaconDevice("Sony JBL","12:90:889","Bsi23",563359987, 988989,true ),
-                BeaconDevice("TM-X","12:90:889","Bsi23",563359987, 988989, false),
-                BeaconDevice("Sony JBL","12:90:889","Bsi23",563359987, 988989, true),
-                BeaconDevice("TM-X","12:90:889","Bsi23",563359987, 988989, true)
+             //   BeaconDevice("Sony JBL","12:90:889","Bsi23",563359987, 988989,true ),
+               // BeaconDevice("TM-X","12:90:889","Bsi23",563359987, 988989, false),
+               // BeaconDevice("Sony JBL","12:90:889","Bsi23",563359987, 988989, true),
+                BeaconDevice("TM-X-2","12:90:889","H fks",563359987, 988989, true)
             )
         }
+
+
+        LaunchedEffect(true) {
+            beaconDevices.forEach {
+                dao.upsert(it)
+            }
+        }
+
+        println( "All the saved data after  $people")
+
+
+
 
         Column (
             modifier = Modifier

@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 
 }
 
@@ -62,6 +64,10 @@ kotlin {
             api(libs.moko.permissions)
             api(libs.moko.permissions.compose)
 
+
+            implementation(libs.room.runtime)
+            implementation(libs.sqlite.bundled)
+
             implementation(libs.androidx.core.ktx)
             api(libs.kotlinx.coroutines.core)
         }
@@ -102,13 +108,14 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
+    dependencies {
+        implementation(libs.androidx.runtime.android)
+        implementation(libs.androidx.bluetooth)
+        debugImplementation(compose.uiTooling)
+    }
 }
 
-dependencies {
-    implementation(libs.androidx.runtime.android)
-    implementation(libs.androidx.bluetooth)
-    debugImplementation(compose.uiTooling)
-}
 
 compose.desktop {
     application {
@@ -120,4 +127,12 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
     }
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
+dependencies {
+    ksp(libs.room.compiler)
 }
