@@ -48,69 +48,82 @@ fun PermissionScreen(navigationState: NavigationNewState) {
 
         val version = platformUtils.getAndroidVersion()
         val isAndroid = platformUtils.isAndroid()
-        when {
+        if (isAndroid){
 
-            // ✅ If BLE permissions are granted & Bluetooth is ON
-            (viewModel.bleScanPermissionState == PermissionState.Granted &&
-                    viewModel.bleConnectPermissionState == PermissionState.Granted &&
-                    viewModel.isBluetoothEnabled) -> {
-                Text("BLE permissions granted!")
-                Spacer(modifier = Modifier.height(50.dp))
-                Button(onClick = {
-                    navigationState.navigateTo(Screen.BleScanning) // Navigate to next screen
-                }) {
-                    Text(stringResource(Res.string.scan_devices))
+            when {
+
+
+                // ✅ If BLE permissions are granted & Bluetooth is ON
+                (viewModel.bleScanPermissionState == PermissionState.Granted &&
+                        viewModel.bleConnectPermissionState == PermissionState.Granted &&
+                        viewModel.isBluetoothEnabled) -> {
+                    Text("BLE permissions granted!")
+                    Spacer(modifier = Modifier.height(50.dp))
+                    Button(onClick = {
+                        navigationState.navigateTo(Screen.BleScanning) // Navigate to next screen
+                    }) {
+                        Text(stringResource(Res.string.scan_devices))
+                    }
+                }
+
+                // ✅ If on Android <12, also check Location permission & status
+                (isAndroid && version < 31 &&
+                        viewModel.bleScanPermissionState == PermissionState.Granted &&
+                        viewModel.locationPermissionState == PermissionState.Granted &&
+                        viewModel.isBluetoothEnabled &&
+                        viewModel.isLocationEnabled) -> {
+                    Text("All required permissions granted!")
+                    Spacer(modifier = Modifier.height(50.dp))
+                    Button(onClick = {
+                        navigationState.navigateTo(Screen.BleScanning)
+                    }) {
+                        Text(stringResource(Res.string.scan_devices))
+                    }
+                }
+
+                // ❌ If any permission is permanently denied
+                (viewModel.bleScanPermissionState == PermissionState.DeniedAlways ||
+                        viewModel.bleConnectPermissionState == PermissionState.DeniedAlways ||
+                        viewModel.locationPermissionState == PermissionState.DeniedAlways) -> {
+                    Text("One or more permissions were permanently denied.")
+                    Spacer(modifier = Modifier.height(50.dp))
+
+                    Button(onClick = {
+                        controller.openAppSettings() // Open settings to enable manually
+                    }) {
+                        Text("Open app settings")
+                    }
+                }
+
+                // ❌ If Bluetooth is OFF
+                !viewModel.isBluetoothEnabled -> {
+                    Text("Please turn on Bluetooth.")
+                }
+
+                // ❌ If on Android <12 and Location is OFF
+                (isAndroid && version < 31 && !viewModel.isLocationEnabled) -> {
+                    Text("Please turn on Location for BLE scanning.")
+                }
+
+                // ❌ If permissions are not yet granted
+                else -> {
+                    Text("Permissions are required for BLE scanning.")
+                    Spacer(modifier = Modifier.height(50.dp))
+                    Button(onClick = { viewModel.provideOrRequestPermissions() }) {
+                        Text("Request BLE permissions")
+                    }
                 }
             }
-
-            // ✅ If on Android <12, also check Location permission & status
-            (isAndroid && version < 31 &&
-                    viewModel.bleScanPermissionState == PermissionState.Granted &&
-                    viewModel.locationPermissionState == PermissionState.Granted &&
-                    viewModel.isBluetoothEnabled &&
-                    viewModel.isLocationEnabled) -> {
-                Text("All required permissions granted!")
-                Spacer(modifier = Modifier.height(50.dp))
-                Button(onClick = {
-                    navigationState.navigateTo(Screen.BleScanning)
-                }) {
-                    Text(stringResource(Res.string.scan_devices))
-                }
-            }
-
-            // ❌ If any permission is permanently denied
-            (viewModel.bleScanPermissionState == PermissionState.DeniedAlways ||
-                    viewModel.bleConnectPermissionState == PermissionState.DeniedAlways ||
-                    viewModel.locationPermissionState == PermissionState.DeniedAlways) -> {
-                Text("One or more permissions were permanently denied.")
-                Spacer(modifier = Modifier.height(50.dp))
-
-                Button(onClick = {
-                    controller.openAppSettings() // Open settings to enable manually
-                }) {
-                    Text("Open app settings")
-                }
-            }
-
-            // ❌ If Bluetooth is OFF
-            !viewModel.isBluetoothEnabled -> {
-                Text("Please turn on Bluetooth.")
-            }
-
-            // ❌ If on Android <12 and Location is OFF
-            (isAndroid && version < 31 && !viewModel.isLocationEnabled) -> {
-                Text("Please turn on Location for BLE scanning.")
-            }
-
-            // ❌ If permissions are not yet granted
-            else -> {
-                Text("Permissions are required for BLE scanning.")
-                Spacer(modifier = Modifier.height(50.dp))
-                Button(onClick = { viewModel.provideOrRequestPermissions() }) {
-                    Text("Request BLE permissions")
-                }
+        }else{
+            Text("BLE permissions granted!")
+            Spacer(modifier = Modifier.height(50.dp))
+            Button(onClick = {
+                navigationState.navigateTo(Screen.BleScanning) // Navigate to next screen
+            }) {
+                Text(stringResource(Res.string.scan_devices))
             }
         }
+
     }
 
 

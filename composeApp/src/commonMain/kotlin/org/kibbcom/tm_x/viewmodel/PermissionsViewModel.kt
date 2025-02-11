@@ -103,7 +103,7 @@ class PermissionsViewModel(
                 isLocationEnabled = platformUtils.isLocationEnabled()
             } else {
                 // iOS (Only Bluetooth permission is required)
-                bleScanPermissionState = controller.getPermissionState(Permission.BLUETOOTH_LE)
+                bleScanPermissionState = PermissionState.Granted
             }
 
             isBluetoothEnabled = platformUtils.isBluetoothEnabled()
@@ -129,7 +129,7 @@ class PermissionsViewModel(
                     }
                 } else {
                     // iOS
-                    controller.providePermission(Permission.BLUETOOTH_LE)
+                    //controller.providePermission(Permission.BLUETOOTH_LE)
                     bleScanPermissionState = PermissionState.Granted
                 }
             } catch (e: DeniedAlwaysException) {

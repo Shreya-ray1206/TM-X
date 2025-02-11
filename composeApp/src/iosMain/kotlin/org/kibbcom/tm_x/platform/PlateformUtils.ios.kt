@@ -8,7 +8,7 @@ actual class PlatformUtils : NSObject() {
     private val centralManager = CBCentralManager()
 
     actual fun isBluetoothEnabled(): Boolean {
-        return centralManager.state == CBCentralManagerStatePoweredOn
+        return true
     }
 
     actual fun isLocationEnabled(): Boolean {
