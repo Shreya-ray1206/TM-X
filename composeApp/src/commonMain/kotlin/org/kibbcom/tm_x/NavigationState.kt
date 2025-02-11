@@ -24,4 +24,7 @@ sealed class Screen {
     object Settings : Screen() {
         override fun toString(): String = "Settings"
     }
+    object Log : Screen() {
+        override fun toString(): String = "Log"
+    }
 }

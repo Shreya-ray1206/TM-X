@@ -57,7 +57,7 @@ kotlin {
             implementation(libs.coil.network.ktor3)
             implementation(libs.ktor.client.core)
 
-            implementation("com.juul.kable:core:0.23.0") // Or latest stable version
+//            implementation("com.juul.kable:core:0.23.0") // Or latest stable version
 
 
 

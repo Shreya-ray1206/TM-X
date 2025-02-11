@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -57,6 +58,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Settings
@@ -117,15 +119,17 @@ fun App(navigationState: NavigationState = remember { NavigationState() }) {
                                     color = MaterialTheme.colors.onPrimary
                                 )
 
-                                Spacer(modifier = Modifier.width(210.dp)) // Adjust the width as needed
+                                //todo code improvement
+                                Spacer(modifier = Modifier.width(150.dp))
+
+                                //todo code improvement  replace with drawable image
 
                                 AsyncImage(
-                                    model = "https://png.pngtree.com/element_our/20190529/ourmid/pngtree-wifi-network-signal-gradient-color-sign-image_1188576.jpg",
-                                    contentDescription = "App Icon",
+                                    model = "https://cdn-icons-png.flaticon.com/512/5464/5464177.png",
+                                    contentDescription = "Connection icon",
                                     modifier = Modifier
-                                        .size(28.dp) // Small size for the icon
-                                        .clip(CircleShape) // Makes the image circular
-                                        .background(color = Color.Black)
+                                        .size(25.dp) // Small size for the icon
+
                                 )
                             }
                         }
@@ -175,7 +179,7 @@ fun DeviceStatusIndicator(isConnected: Boolean) {
 
 @Composable
 fun Footer(navigationState: NavigationState){
-    val items = listOf(Screen.Device, Screen.Beacon, Screen.Settings)
+    val items = listOf(Screen.Device, Screen.Beacon, Screen.Settings, Screen.Log)
     val selectedItem = navigationState.currentScreen
 
     BottomNavigation(
@@ -188,6 +192,7 @@ fun Footer(navigationState: NavigationState){
                         is Screen.Device -> Icon(Icons.Default.Home, contentDescription = screen.toString())
                         is Screen.Beacon -> Icon(Icons.Default.LocationOn, contentDescription = screen.toString())
                         is Screen.Settings -> Icon(Icons.Default.Settings, contentDescription = screen.toString())
+                        is Screen.Log -> Icon(Icons.Default.Info, contentDescription = screen.toString()) // Add icon for Log
                     }
                 },
                 label = { Text(screen.toString()) },
@@ -207,6 +212,7 @@ fun Navigation(navigationState: NavigationState, modifier: Modifier = Modifier) 
         is Screen.Device -> DeviceScreen()
         is Screen.Beacon -> BeaconScreen()
         is Screen.Settings -> SettingsScreen()
+        is Screen.Log -> LogScreen()
 
     }
 }
@@ -437,129 +443,6 @@ fun DeviceItem(device: Device) {
 
 
 
-@Composable
-fun BeaconScreen() {
-    var isBeaconEnabled by remember { mutableStateOf(true) }
-    var isScanning by remember { mutableStateOf(false) }
-    var expanded by remember { mutableStateOf(false) }
-    var selectedType by remember { mutableStateOf("Choose Type") }
-
-    // Sample data for beacon devices
-    val beaconDevices = remember {
-        listOf(
-            BeaconDevice("Sony JBL","12:90:889","Bsi23",563359987, 988989,true ),
-            BeaconDevice("TM-X","12:90:889","Bsi23",563359987, 988989, false),
-            BeaconDevice("Sony JBL","12:90:889","Bsi23",563359987, 988989, true),
-            BeaconDevice("TM-X","12:90:889","Bsi23",563359987, 988989, true)
-        )
-    }
-
-    Column (
-       modifier = Modifier
-           .fillMaxSize()
-           .padding(16.dp)
-    ) {
-        // Beacon Control Card
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            backgroundColor = MaterialTheme.colors.surface,
-            border = BorderStroke(1.dp, CardBorderColor),
-            shape = RoundedCornerShape(18.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .background(color = Color.Transparent),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-
-                    AsyncImage(
-                        model = "https://images-platform.99static.com//CSsrGrz0M4afBGYk1e3W1iMEa6c=/1759x1132:2800x2173/fit-in/500x500/projects-files/160/16075/1607511/37cfbdae-164c-4d70-884f-c3d629db72c0.png",
-                        contentDescription = "beacon",
-                        modifier = Modifier
-                            .size(50.dp) // Size of the image
-                            .clip(RoundedCornerShape(10))
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Text(
-                        text = "Beacon",
-                        style = MaterialTheme.typography.h6,
-                        color = MaterialTheme.colors.onSurface
-                    )
-                }
-
-                Switch(
-                    checked = isBeaconEnabled,
-                    onCheckedChange = { isBeaconEnabled = it },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = MaterialTheme.colors.secondary,
-                        checkedTrackColor = MaterialTheme.colors.secondary.copy(alpha = 0.5f),
-                        uncheckedThumbColor = Color.Gray,
-                        uncheckedTrackColor = Color.LightGray
-                    )
-                )
-            }
-        }
-
-        if (isScanning) {
-            Button(
-                onClick = { isScanning = false },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = MaterialTheme.colors.secondary,
-                    contentColor = Color.White
-                )
-            ) {
-                Text("Stop Scanning")
-            }
-        }
-
-        // Buttons for type selection
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Button(
-                onClick = { selectedType = "Eddy Stone" },
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = if (selectedType == "Eddy Stone") MaterialTheme.colors.primary else MaterialTheme.colors.surface
-                )
-            ) {
-                Text("Eddy Stone")
-            }
-
-            Button(
-                onClick = { selectedType = "Beacon" },
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = if (selectedType == "Beacon") MaterialTheme.colors.primary else MaterialTheme.colors.surface
-                )
-            ) {
-                Text("Beacon")
-            }
-        }
-
-        // Beacon List
-        Column(modifier = Modifier.fillMaxSize().padding(vertical = 8.dp)) {
-            beaconDevices.forEach { beacon ->
-                BeaconItem(beacon = beacon)
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-        }
-
-
-    }
-}
 
 data class BeaconDevice(
     val name: String,

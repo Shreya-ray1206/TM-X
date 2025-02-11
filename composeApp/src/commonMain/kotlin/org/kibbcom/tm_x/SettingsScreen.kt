@@ -24,8 +24,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
@@ -115,6 +118,12 @@ fun SettingsScreen() {
         item {
             DropDown(title = "Audio Codec", imageUrl = "https://cdn-icons-png.flaticon.com/512/3871/3871560.png") {
                 AudioCodec()
+            }
+        }
+
+        item {
+            DropDown(title = "Send GPS Fix", imageUrl = "https://cdn-icons-png.flaticon.com/512/3871/3871560.png") {
+               SendGpsFix()
             }
         }
     }
@@ -294,7 +303,12 @@ fun EditableRow(value: String, onValueChange: (String) -> Unit, label: String) {
             value = value,
             onValueChange = onValueChange,
             placeholder = { Text(label) },
-            modifier = Modifier.weight(1f) // Allows space for the icon
+            modifier = Modifier
+                .weight(1f) // Allows space for the icon
+                .padding(2.dp),
+            textStyle = LocalTextStyle.current.copy(
+                fontSize = 20.sp // Adjust the font size of the text
+            )
         )
 
         Spacer(modifier = Modifier.width(8.dp)) // Adds spacing before the icon
@@ -542,108 +556,31 @@ fun VibratorSettings(){
     }
 }
 
+
 @Composable
-fun  AccelerometerSettings () {
-    val isExpanded by remember { mutableStateOf(false) }
-    Column (
+fun AccelerometerSettings() {
+    var selectedRange by remember { mutableStateOf("Select") }
+    var selectedResolution by remember { mutableStateOf("Select") }
+    var selectedWakeGain by remember { mutableStateOf("Select") }
+    var selectedSniffGain by remember { mutableStateOf("Select") }
+
+    val rangeOptions = listOf("2G", "4G", "8G", "16G")
+    val resolutionOptions = listOf("6-bit", "7-bit", "8-bit", "10-bit","11-bit","12-bit")
+    val wakeGainOptions = listOf("1x", "2x", "4x", "8x")
+    val sniffGainOptions = listOf("1x", "2x", "3x", "4x")
+
+    Column(
         modifier = Modifier
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
-    ){
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "Set Range",
-                fontSize = 14.sp)
-
-            Row() {
-                Text("Select")
-
-                Icon(
-                    imageVector = if (isExpanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
-                    contentDescription = "Dropdown choose for select Range of Accelerometer"
-                )
-
-                if(isExpanded) {
-//                  The logic of changing the mode goes here
-                }
-            }
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "Set Resolution",
-                fontSize = 14.sp)
-
-            Row() {
-                Text("Select")
-
-                Icon(
-                    imageVector = if (isExpanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
-                    contentDescription = "Dropdown choose for select Resolution of Accelerometer"
-                )
-
-                if(isExpanded) {
-//                  The logic of changing the mode goes here
-                }
-            }
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "Set Wake Gain",
-                fontSize = 14.sp)
-
-            Row() {
-                Text("Select")
-
-                Icon(
-                    imageVector = if (isExpanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
-                    contentDescription = "Dropdown choose for select wake gain of Accelerometer"
-                )
-
-                if(isExpanded) {
-//                  The logic of changing the mode goes here
-                }
-            }
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "Set Sniff Gain",
-                fontSize = 14.sp)
-
-            Row() {
-                Text("Select")
-
-                Icon(
-                    imageVector = if (isExpanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
-                    contentDescription = "Dropdown choose for select wake gain of Accelerometer"
-                )
-
-                if(isExpanded) {
-//                  The logic of changing the mode goes here
-                }
-            }
-        }
-
+    ) {
+        DropdownSelector(title = "Set Range", options = rangeOptions, selectedOption = selectedRange) { selectedRange = it }
+        DropdownSelector(title = "Set Resolution", options = resolutionOptions, selectedOption = selectedResolution) { selectedResolution = it }
+        DropdownSelector(title = "Set Wake Gain", options = wakeGainOptions, selectedOption = selectedWakeGain) { selectedWakeGain = it }
+        DropdownSelector(title = "Set Sniff Gain", options = sniffGainOptions, selectedOption = selectedSniffGain) { selectedSniffGain = it }
     }
 }
+
 
 @Composable
 fun LteSettings() {
@@ -681,34 +618,15 @@ fun LteSettings() {
 
 @Composable
 fun LightSensor() {
-    val isExpanded by remember { mutableStateOf(false) }
+    var selectedMode by remember { mutableStateOf("Select") }
+
+    val modesOptions = listOf("Continuous", "Device Id", "Default Value","Manufacture Id", "One Short")
     Column (
         modifier = Modifier
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ){
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "ALS Modes",
-                fontSize = 14.sp)
-
-            Row() {
-                Text("Select")
-
-                Icon(
-                    imageVector = if (isExpanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
-                    contentDescription = "Dropdown choose for als mode of LightSensor"
-                )
-
-                if(isExpanded) {
-//                  The logic of changing the mode goes here
-                }
-            }
-        }
+        DropdownSelector(title = "Asle Modes", options = modesOptions, selectedOption = selectedMode) { selectedMode= it }
 
     }
 }
@@ -779,4 +697,60 @@ fun AudioCodec() {
             }
         }
     }
+}
+
+@Composable
+fun DropdownSelector(
+    title: String,
+    options: List<String>,
+    selectedOption: String,
+    onOptionSelected: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = true },
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = title,
+            fontSize = 14.sp
+        )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = selectedOption)
+
+            Icon(
+                imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                contentDescription = "Dropdown Icon"
+            )
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                options.forEach { option ->
+                    DropdownMenuItem(
+                        onClick = {
+                            onOptionSelected(option)
+                            expanded = false
+                        },
+                        modifier = Modifier.background(Color.Black)
+                    ) {
+                        Text(text = option)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SendGpsFix() {
+    Text(text = "GPS Fix Sent", fontSize = 16.sp, fontWeight = FontWeight.Medium)
 }
