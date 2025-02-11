@@ -7,4 +7,5 @@
     <string name="settings">Inställningar</string>
     <string name="ble_devices">BLE-enheter</string>
     <string name="beacon_devices">Fyr-enheter</string>
+
 </resources>

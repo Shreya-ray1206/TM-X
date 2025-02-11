@@ -3,6 +3,7 @@ package org.kibbcom.tm_x
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
@@ -28,6 +29,7 @@ import org.kibbcom.tm_x.theme.primaryWhite
 import tm_x.composeapp.generated.resources.Res
 import tm_x.composeapp.generated.resources.beacon_devices
 import tm_x.composeapp.generated.resources.ble_devices
+import tm_x.composeapp.generated.resources.logs
 import tm_x.composeapp.generated.resources.settings
 
 @Composable
@@ -46,6 +48,7 @@ fun App(navigationState: NavigationNewState = remember { NavigationNewState() })
                 is Screen.BleScanning -> BleScanningScreen(navigationState, paddingValues)
                 is Screen.Beacon -> BeaconScreen(navigationState, paddingValues)
                 is Screen.Settings -> SettingsScreen(navigationState, paddingValues)
+                is Screen.LogScreen -> LogScreen(navigationState, paddingValues)
                 is Screen.Permission -> PermissionScreen(navigationState)
                 is Screen.DummyScreen -> DummyScreen(navigationState,paddingValues)
                 else -> {}
@@ -57,7 +60,7 @@ fun App(navigationState: NavigationNewState = remember { NavigationNewState() })
 
 @Composable
 fun BottomNavigationBar(navigationState: NavigationNewState) {
-    val items = listOf(Screen.BleScanning, Screen.Beacon, Screen.Settings)
+    val items = listOf(Screen.BleScanning, Screen.Beacon, Screen.Settings,Screen.LogScreen)
     val isDarkTheme = isSystemInDarkTheme() // Detect dark mode
 
     NavigationBar(
@@ -72,6 +75,7 @@ fun BottomNavigationBar(navigationState: NavigationNewState) {
                             is Screen.BleScanning -> Icons.Outlined.LocationOn
                             is Screen.Beacon -> Icons.Outlined.LocationOn
                             is Screen.Settings -> Icons.Outlined.Settings
+                            is Screen.LogScreen -> Icons.Outlined.Info
                             else -> Icons.Outlined.Settings
                         },
                         contentDescription = screen.toString()
@@ -106,6 +110,7 @@ fun getNameTitle(screen: Screen): String {
         is Screen.Beacon -> stringResource(Res.string.beacon_devices)
         is Screen.BleScanning -> stringResource(Res.string.ble_devices)
         is Screen.Settings -> stringResource(Res.string.settings)
+        is Screen.LogScreen -> stringResource(Res.string.logs)
         else -> "TMX-Kibbcom"
     }
 }

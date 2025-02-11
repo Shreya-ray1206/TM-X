@@ -9,7 +9,7 @@ class NavigationNewState {
     val currentScreen: Screen get() = _screenStack.last()
 
     val showBottomBar: Boolean
-        get() = currentScreen in listOf(Screen.BleScanning, Screen.Beacon, Screen.Settings)
+        get() = currentScreen in listOf(Screen.BleScanning, Screen.Beacon, Screen.Settings,Screen.LogScreen)
 
     fun navigateTo(screen: Screen) {
         if (screen in listOf(Screen.BleScanning)) {

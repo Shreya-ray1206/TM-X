@@ -20,5 +20,8 @@ sealed class Screen {
     object DummyScreen : Screen(){
         override fun toString(): String = "DummyScreen"
     }
+    object LogScreen : Screen(){
+        override fun toString(): String = "LogScreen"
+    }
 
 }

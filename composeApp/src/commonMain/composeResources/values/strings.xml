@@ -5,6 +5,7 @@
     <string name = "scanning">Scanning</string>
     <string name = "beacon">Beacon</string>
     <string name = "settings">Settings</string>
-    <string name = "ble_devices">BLE Devices</string>
-    <string name = "beacon_devices">Beacon Devices</string>
+    <string name = "ble_devices">Devices</string>
+    <string name = "beacon_devices">Beacon</string>
+    <string name = "logs">Logs</string>
 </resources>

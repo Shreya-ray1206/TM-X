@@ -17,6 +17,7 @@ import org.kibbcom.tm_x.theme.primaryWhite
 import tm_x.composeapp.generated.resources.Res
 import tm_x.composeapp.generated.resources.beacon_devices
 import tm_x.composeapp.generated.resources.ble_devices
+import tm_x.composeapp.generated.resources.logs
 import tm_x.composeapp.generated.resources.settings
 
 @Composable
@@ -26,6 +27,7 @@ fun getScreenTitle(screen: Screen): String {
         is Screen.Beacon -> stringResource(Res.string.beacon_devices)
         is Screen.BleScanning -> stringResource(Res.string.ble_devices)
         is Screen.Settings -> stringResource(Res.string.settings)
+        is Screen.LogScreen -> stringResource(Res.string.logs)
         else -> "TMX-Kibbcom"
     }
 }
@@ -36,6 +38,7 @@ fun CustomTopBar(navigationState: NavigationNewState) {
         is Screen.BleScanning -> DefaultTopBar(getScreenTitle(navigationState.currentScreen))
         is Screen.Beacon -> DefaultTopBar(getScreenTitle(navigationState.currentScreen))
         is Screen.Settings -> DefaultTopBar(getScreenTitle(navigationState.currentScreen))
+        is Screen.LogScreen -> DefaultTopBar(getScreenTitle(navigationState.currentScreen))
         is Screen.DummyScreen -> BackTopBar(navigationState,"New Screen") // Special TopBar with a back button
         else -> {}
     }
