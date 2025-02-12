@@ -8,11 +8,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
@@ -21,6 +23,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
@@ -41,19 +44,25 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import org.kibbcom.tm_x.NavigationNewState
+import org.kibbcom.tm_x.models.BeaconDevice
 import org.kibbcom.tm_x.platform.BackHandler
 
 
-@Composable
-fun SettingsScreen(navigationState: NavigationNewState,paddingValues : PaddingValues) {
 
+
+@Composable
+fun SettingsScreen(navigationState: NavigationNewState, paddingValues : PaddingValues,
+
+) {
     Column(
         modifier = Modifier
-            .fillMaxSize() .padding(paddingValues)
+            .fillMaxSize()
+            .padding(paddingValues)
             .background(MaterialTheme.colorScheme.background), // Uses M3 background color
-        verticalArrangement = Arrangement.Top,
+        verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
 
@@ -64,11 +73,15 @@ fun SettingsScreen(navigationState: NavigationNewState,paddingValues : PaddingVa
 
         LazyColumn (
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 10.dp, vertical = 40.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceBetween
+
         ) {
             item {
-                DropDown(title = "Device Info", imageUrl = "https://cdn-icons-png.flaticon.com/512/411/411727.png") {
+                DropDown(
+                    title = "Device Info",
+                    imageUrl = "https://cdn-icons-png.flaticon.com/512/411/411727.png",
+                ) {
                     DeviceInfo()
                 }
             }
@@ -88,7 +101,7 @@ fun SettingsScreen(navigationState: NavigationNewState,paddingValues : PaddingVa
             item {
                 DropDown(title = "Beacon Devices and Tracking", imageUrl = "https://w1.pngwing.com/pngs/788/838/png-transparent-family-symbol-ibeacon-bluetooth-low-energy-beacon-proximity-marketing-eddystone-altbeacon-apple-nearfield-communication-thumbnail.png") {
                     //todo need fix with material 3
-                    //BeaconDevices()
+                 BeaconDevices()
                 }
             }
 
@@ -144,34 +157,42 @@ fun SettingsScreen(navigationState: NavigationNewState,paddingValues : PaddingVa
 fun DropDown(
     title: String,
     imageUrl: String,
-    content: @Composable () -> Unit
+
+    content: @Composable () -> Unit,
+
 ) {
     var isExpanded by remember { mutableStateOf(false) }
+
+
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(horizontal = 5.dp, vertical = 10.dp)
+        ,
+        verticalArrangement = Arrangement.SpaceEvenly
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { isExpanded = !isExpanded }
-                .padding(8.dp),
+                .clickable { isExpanded = !isExpanded } ,// I haven't removed here
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+//            verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 AsyncImage(
                     model = imageUrl,
                     contentDescription = "Dropdown Image",
-                    modifier = Modifier.size(40.dp),
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .size(35.dp),
                     contentScale = ContentScale.Crop
                 )
 
-                Spacer(modifier = Modifier.width(8.dp))
+//                Spacer(modifier = Modifier.width(8.dp))
 
                 Text(
                     text = title,
@@ -191,7 +212,7 @@ fun DropDown(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp)
+
             ) {
                 content()
             }
@@ -204,33 +225,36 @@ fun DropDown(
 fun ToggleSection(
     title: String,
     imageUrl: String,
+
     content: @Composable () -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(false) }
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(horizontal = 5.dp, vertical = 10.dp),
+        verticalArrangement = Arrangement.SpaceEvenly
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
+                .clickable { isExpanded = !isExpanded },
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 AsyncImage(
                     model = imageUrl,
                     contentDescription = "Toggle Image",
-                    modifier = Modifier.size(40.dp),
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .size(35.dp),
                     contentScale = ContentScale.Crop
                 )
 
-                Spacer(modifier = Modifier.width(8.dp))
+
 
                 Text(
                     text = title,
@@ -252,8 +276,7 @@ fun ToggleSection(
         if (isExpanded) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
+                    .fillMaxWidth(),
             ) {
                 content()
             }
@@ -268,7 +291,12 @@ fun DeviceInfo() {
     var deviceAddress by remember { mutableStateOf("") }
     var deviceNo by remember { mutableStateOf("") }
 
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxHeight()
+            .fillMaxSize()
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+    ) {
         EditableRow(value = deviceName, onValueChange = { deviceName = it }, label = "Device Name")
         EditableRow(value = deviceAddress, onValueChange = { deviceAddress = it }, label = "Device Address")
         EditableRow(value = deviceNo, onValueChange = { deviceNo = it }, label = "Device No")
@@ -306,8 +334,10 @@ fun EditableRow(value: String, onValueChange: (String) -> Unit, label: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically // Aligns icon and text field
+            .fillMaxHeight()
+            .padding(bottom = 5.dp),
+        verticalAlignment = Alignment.CenterVertically, // Aligns icon and text field
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         TextField(
             value = value,
@@ -321,7 +351,7 @@ fun EditableRow(value: String, onValueChange: (String) -> Unit, label: String) {
             )
         )
 
-        Spacer(modifier = Modifier.width(8.dp)) // Adds spacing before the icon
+//        Spacer(modifier = Modifier.width(8.dp)) // Adds spacing before the icon
 
         IconButton(onClick = { /* Handle click */ }) {
             Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
@@ -364,13 +394,38 @@ fun SeverSettings () {
     }
 }
 
+
+
+@Composable
+fun BeaconDevices() {
+    val beaconDevices = remember {
+        listOf(
+            BeaconDevice("Sony JBL","12:90:889","Bsi23",563359987, 988989, true),
+            BeaconDevice("TM-X","12:90:889","Bsi23",563359987, 988989,false),
+            BeaconDevice("Sony JBL","12:90:889","Bsi23",563359987, 988989, true),
+            BeaconDevice("TM-X","12:90:889","Bsi23",563359987, 988989, true)
+        )
+    }
+
+    // Beacon List
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 5.dp, vertical = 10.dp)) {
+        beaconDevices.forEach { beacon ->
+            BeaconItem(beacon = beacon)
+
+        }
+    }
+}
+
 @Composable
 fun OtherInfo() {
     var timeOfGPS by remember { mutableStateOf("") }
     var isExpanded by remember { mutableStateOf(false) }
     Column (
         modifier = Modifier
-            .padding(16.dp),
+            .padding(horizontal = 5.dp, vertical = 10.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp) // Add spacing between items
     ) {
         EditableRow(value = timeOfGPS , onValueChange = { timeOfGPS = it }, "GPS Time Interval (IN SECS")
@@ -403,7 +458,7 @@ fun LedControl() {
     val isExpanded by remember { mutableStateOf(false) }
     Column (
         modifier = Modifier
-            .padding(16.dp),
+            .padding(horizontal = 5.dp, vertical = 10.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp) // Add spacing between items
     ){
         Row(
@@ -519,7 +574,7 @@ fun VibratorSettings(){
     val isExpanded by remember { mutableStateOf(false) }
     Column (
         modifier = Modifier
-            .padding(16.dp),
+            .padding(horizontal = 5.dp, vertical = 10.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp) // Add spacing between items
     ){
         Row(
@@ -563,7 +618,7 @@ fun AccelerometerSettings() {
 
     Column(
         modifier = Modifier
-            .padding(16.dp),
+            .padding(horizontal = 5.dp, vertical = 10.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         DropdownSelector(title = "Set Range", options = rangeOptions, selectedOption = selectedRange) { selectedRange = it }
@@ -579,7 +634,7 @@ fun LteSettings() {
     val isExpanded by remember { mutableStateOf(false) }
     Column (
         modifier = Modifier
-            .padding(16.dp),
+            .padding(horizontal = 5.dp, vertical = 10.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ){
         Row(
@@ -615,7 +670,7 @@ fun LightSensor() {
     val modesOptions = listOf("Continuous", "Device Id", "Default Value","Manufacture Id", "One Short")
     Column (
         modifier = Modifier
-            .padding(16.dp),
+            .padding(horizontal = 5.dp, vertical = 10.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ){
         DropdownSelector(title = "Asle Modes", options = modesOptions, selectedOption = selectedMode) { selectedMode= it }
@@ -627,7 +682,7 @@ fun LightSensor() {
 fun AudioCodec() {
     Column(
         modifier = Modifier
-            .padding(16.dp),
+            .padding(horizontal = 5.dp, vertical = 10.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
 
     ) {
@@ -727,17 +782,18 @@ fun DropdownSelector(
                 onDismissRequest = { expanded = false }
             ) {
                 options.forEach { option ->
-                    //todo fix with material 3
-                    /*
                     DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = option,
+                                color = MaterialTheme.colorScheme.onSurface // Use M3 onSurface color for text
+                            )
+                        },
                         onClick = {
                             onOptionSelected(option)
                             expanded = false
-                        },
-                        modifier = Modifier.background(Color.Black)
-                    ) {
-                        Text(text = option)
-                    }*/
+                        }
+                    )
                 }
             }
         }
