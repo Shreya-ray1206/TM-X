@@ -1,5 +1,6 @@
 package org.kibbcom.tm_x.screen
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -40,17 +41,29 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
+import org.jetbrains.compose.resources.painterResource
 import org.kibbcom.tm_x.NavigationNewState
+import org.kibbcom.tm_x.getImageResourcePath
 import org.kibbcom.tm_x.models.BeaconDevice
 import org.kibbcom.tm_x.platform.BackHandler
-
-
+import tm_x.composeapp.generated.resources.Accelerometer_settings
+import tm_x.composeapp.generated.resources.Res
+import tm_x.composeapp.generated.resources.beacon
+import tm_x.composeapp.generated.resources.device_info
+import tm_x.composeapp.generated.resources.led
+import tm_x.composeapp.generated.resources.light_sensor
+import tm_x.composeapp.generated.resources.lte_settings
+import tm_x.composeapp.generated.resources.other_setting
+import tm_x.composeapp.generated.resources.sever_settings
+import tm_x.composeapp.generated.resources.vibrator_settings
+import tm_x.composeapp.generated.resources.vol_settings
 
 
 @Composable
@@ -80,67 +93,95 @@ fun SettingsScreen(navigationState: NavigationNewState, paddingValues : PaddingV
             item {
                 DropDown(
                     title = "Device Info",
-                    imageUrl = "https://cdn-icons-png.flaticon.com/512/411/411727.png",
+                    image = painterResource(Res.drawable.device_info)
                 ) {
                     DeviceInfo()
+
                 }
             }
 
             item {
-                DropDown(title = "Other Settings", imageUrl = "https://cdn-icons-png.freepik.com/256/900/900834.png?semt=ais_hybrid") {
+                DropDown(
+                    title = "Other Settings",
+                    image = painterResource(Res.drawable.other_setting)
+                ) {
                     OtherInfo()
                 }
             }
 
             item {
-                ToggleSection(title = "LED Settings", imageUrl = "https://cdn-icons-png.freepik.com/256/6092/6092698.png?semt=ais_hybrid") {
+                ToggleSection(
+                    title = "LED Settings",
+                    image = painterResource(Res.drawable.led)
+                ) {
                     LedControl()
                 }
             }
 
             item {
-                DropDown(title = "Beacon Devices and Tracking", imageUrl = "https://w1.pngwing.com/pngs/788/838/png-transparent-family-symbol-ibeacon-bluetooth-low-energy-beacon-proximity-marketing-eddystone-altbeacon-apple-nearfield-communication-thumbnail.png") {
+                DropDown(title = "Beacon Devices and Tracking",
+                    painterResource(Res.drawable.beacon)
+                ) {
                     //todo need fix with material 3
                  BeaconDevices()
                 }
             }
 
             item {
-                DropDown(title = "Server Settings", imageUrl = "https://cdn-icons-png.flaticon.com/512/2092/2092780.png") {
+                DropDown(
+                    title = "Server Settings",
+                    painterResource(Res.drawable.sever_settings)
+                ) {
                     SeverSettings()
                 }
             }
 
             item {
-                ToggleSection(title = "Vibrator Settings", imageUrl = "https://cdn-icons-png.flaticon.com/512/733/733525.png") {
+                ToggleSection(
+                    title = "Vibrator Settings",
+                    painterResource(Res.drawable.vibrator_settings)
+                ) {
                     VibratorSettings()
                 }
             }
             item {
-                ToggleSection(title = "Accelerometer Settings", imageUrl = "https://cdn-icons-png.flaticon.com/512/11256/11256223.png") {
+                ToggleSection(
+                    title = "Accelerometer Settings",
+                    painterResource(Res.drawable.Accelerometer_settings)) {
                     AccelerometerSettings()
                 }
             }
             item {
-                ToggleSection(title = "LTE Settings", imageUrl = "https://cdn-icons-png.flaticon.com/512/2313/2313502.png") {
+                ToggleSection(
+                    title = "LTE Settings",
+                    painterResource(Res.drawable.lte_settings)
+                ) {
                     LteSettings()
                 }
             }
 
             item {
-                ToggleSection(title = "Light Sensor", imageUrl = "https://cdn-icons-png.flaticon.com/512/11298/11298689.png") {
+                ToggleSection(
+                    title = "Light Sensor",
+                    painterResource(Res.drawable.light_sensor)
+                ) {
                     LightSensor()
                 }
             }
 
             item {
-                DropDown(title = "Audio Codec", imageUrl = "https://cdn-icons-png.flaticon.com/512/3871/3871560.png") {
+                DropDown(
+                    title = "Audio Codec",
+                    painterResource(Res.drawable.vol_settings)
+                ) {
                     AudioCodec()
                 }
             }
 
             item {
-                DropDown(title = "Send GPS Fix", imageUrl = "https://cdn-icons-png.flaticon.com/512/3871/3871560.png") {
+                DropDown(
+                    title = "Send GPS Fix",
+                    painterResource(Res.drawable.vol_settings) ) {
                     SendGpsFix()
                 }
             }
@@ -156,12 +197,14 @@ fun SettingsScreen(navigationState: NavigationNewState, paddingValues : PaddingV
 @Composable
 fun DropDown(
     title: String,
-    imageUrl: String,
-
+    image :Painter,
     content: @Composable () -> Unit,
 
 ) {
     var isExpanded by remember { mutableStateOf(false) }
+
+    // Get the platform-specific image resource path
+//    val image = getImageResourcePath(imageName)
 
 
 
@@ -183,12 +226,22 @@ fun DropDown(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                AsyncImage(
-                    model = imageUrl,
+//                AsyncImage(
+//                    model = painterResource(Res.drawable.device_info),
+//                    contentDescription = "Dropdown Image",
+//                    modifier = Modifier
+//                        .wrapContentSize()
+//                        .size(35.dp),
+//                    contentScale = ContentScale.Crop
+//                )
+
+                Image(
+                    painter = image,  // Correct way to use it
                     contentDescription = "Dropdown Image",
                     modifier = Modifier
                         .wrapContentSize()
-                        .size(35.dp),
+                        .size(50.dp)
+                        .padding(8.dp),
                     contentScale = ContentScale.Crop
                 )
 
@@ -224,8 +277,7 @@ fun DropDown(
 @Composable
 fun ToggleSection(
     title: String,
-    imageUrl: String,
-
+    image: Painter,
     content: @Composable () -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -245,16 +297,24 @@ fun ToggleSection(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                AsyncImage(
-                    model = imageUrl,
-                    contentDescription = "Toggle Image",
+//                AsyncImage(
+//                    model = imageUrl,
+//                    contentDescription = "Toggle Image",
+//                    modifier = Modifier
+//                        .wrapContentSize()
+//                        .size(35.dp),
+//                    contentScale = ContentScale.Crop
+//                )
+
+                Image(
+                    painter = image,  // Correct way to use it
+                    contentDescription = "Dropdown Image",
                     modifier = Modifier
                         .wrapContentSize()
-                        .size(35.dp),
+                        .size(50.dp)
+                        .padding(8.dp),
                     contentScale = ContentScale.Crop
                 )
-
-
 
                 Text(
                     text = title,
