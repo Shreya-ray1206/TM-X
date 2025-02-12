@@ -2,15 +2,15 @@ package org.kibbcom.tm_x.platform
 
 import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
-import database.BeaconDatabase
+import database.TmxDatabase
 import platform.Foundation.NSHomeDirectory
 
 
-actual fun getTmxDatabase(): BeaconDatabase {
+actual fun getTmxDatabase(): TmxDatabase {
     val dbFile = NSHomeDirectory() + "/tmx.db"
-    return Room.databaseBuilder<BeaconDatabase>(
+    return Room.databaseBuilder<TmxDatabase>(
         name = dbFile,
-        factory = { BeaconDatabase::class.instantiateImpl() }
+        factory = { TmxDatabase::class.instantiateImpl() }
     )
         .setDriver(BundledSQLiteDriver())
         .build()

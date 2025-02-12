@@ -11,12 +11,12 @@ import org.kibbcom.tm_x.models.BeaconDevice
 interface BeaconDao {
 
     @Upsert
-    suspend fun upsert(person: BeaconDevice)
+    suspend fun upsert(beaconDevice: BeaconDevice)
 
     @Delete
-    suspend fun delete(person: BeaconDevice)
+    suspend fun delete(beaconDevice: BeaconDevice)
 
     @Query("SELECT * FROM beacon_devices")
-    fun getAllPeople(): Flow<List<BeaconDevice>>
+    fun getAllBeaconDevice(): Flow<List<BeaconDevice>>
 
 }

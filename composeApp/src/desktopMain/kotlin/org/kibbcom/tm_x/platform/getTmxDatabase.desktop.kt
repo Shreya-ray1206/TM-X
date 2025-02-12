@@ -1,9 +1,9 @@
 package org.kibbcom.tm_x.platform
 
-import database.BeaconDatabase
+import database.TmxDatabase
 
 
 
-actual fun getTmxDatabase(): BeaconDatabase {
+actual fun getTmxDatabase(): TmxDatabase {
     TODO("Not yet implemented")
 }

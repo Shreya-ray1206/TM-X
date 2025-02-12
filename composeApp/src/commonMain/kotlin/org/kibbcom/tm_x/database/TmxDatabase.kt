@@ -8,7 +8,7 @@ import org.kibbcom.tm_x.models.BeaconDevice
     entities = [BeaconDevice::class],
     version = 1
 )
-abstract class BeaconDatabase: RoomDatabase() {
+abstract class TmxDatabase: RoomDatabase() {
 
     abstract fun beaconDao(): BeaconDao
 

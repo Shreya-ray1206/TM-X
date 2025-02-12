@@ -1,6 +1,6 @@
 package org.kibbcom.tm_x.platform
 
-import database.BeaconDatabase
+import database.TmxDatabase
 
 
-expect fun getTmxDatabase(): BeaconDatabase
+expect fun getTmxDatabase(): TmxDatabase
