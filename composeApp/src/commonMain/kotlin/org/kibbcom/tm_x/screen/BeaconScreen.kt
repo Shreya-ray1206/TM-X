@@ -1,7 +1,6 @@
 package org.kibbcom.tm_x.screen
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -31,6 +29,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,18 +40,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
-import org.jetbrains.compose.resources.painterResource
+import appDatabase.AppDatabase
+import appDatabase.GithubRepoEntity
+import kotlinx.coroutines.delay
 import org.kibbcom.tm_x.NavigationNewState
 import org.kibbcom.tm_x.Screen
 import org.kibbcom.tm_x.models.BeaconDevice
 import org.kibbcom.tm_x.platform.BackHandler
 import org.kibbcom.tm_x.theme.CardBorderColor
-import tm_x.composeapp.generated.resources.Res
 
 
 @Composable
-fun BeaconScreen(  navigationState: NavigationNewState,paddingValues: PaddingValues){
+fun BeaconScreen(db: AppDatabase, navigationState: NavigationNewState, paddingValues: PaddingValues){
 
 
     Column(
@@ -66,6 +65,22 @@ fun BeaconScreen(  navigationState: NavigationNewState,paddingValues: PaddingVal
         BackHandler {
             navigationState.navigateBack()  // Handle back press
         }
+
+
+        val mydao = db.getDao()
+
+      val git1 =   GithubRepoEntity(1,"Mukesh", "5 star","dffffffffff")
+      val git2 =   GithubRepoEntity(2,"Sumit", " 7 star","sdsdddddddddddddddddsd")
+
+        LaunchedEffect(Unit){
+            mydao.insert(git1)
+            delay(2000)
+            mydao.insert(git2)
+            delay(2000)
+            val list = mydao.getAll()
+            println("My data is $list")
+        }
+
 
         var isBeaconEnabled by remember { mutableStateOf(true) }
         var isScanning by remember { mutableStateOf(false) }

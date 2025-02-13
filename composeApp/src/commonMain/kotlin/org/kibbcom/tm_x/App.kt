@@ -15,6 +15,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import appDatabase.AppDatabase
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.kibbcom.tm_x.screen.BeaconScreen
@@ -34,7 +35,7 @@ import tm_x.composeapp.generated.resources.settings
 
 @Composable
 @Preview
-fun App(navigationState: NavigationNewState = remember { NavigationNewState() }) {
+fun App(db: AppDatabase, navigationState: NavigationNewState = remember { NavigationNewState() }) {
     TmxAppTheme { // Apply the custom theme here
         Scaffold(
             topBar = { CustomTopBar(navigationState) },
@@ -46,7 +47,7 @@ fun App(navigationState: NavigationNewState = remember { NavigationNewState() })
         ) { paddingValues ->  // Capture padding from Scaffold
             when (navigationState.currentScreen) {
                 is Screen.BleScanning -> BleScanningScreen(navigationState, paddingValues)
-                is Screen.Beacon -> BeaconScreen(navigationState, paddingValues)
+                is Screen.Beacon -> BeaconScreen(db,navigationState, paddingValues)
                 is Screen.Settings -> SettingsScreen(navigationState, paddingValues)
                 is Screen.LogScreen -> LogScreen(navigationState, paddingValues)
                 is Screen.Permission -> PermissionScreen(navigationState)

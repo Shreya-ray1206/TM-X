@@ -5,6 +5,9 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    //Room step2 -> plugins
+    id("androidx.room") version "2.7.0-beta01"
+    id("com.google.devtools.ksp") version "2.1.10-1.0.29" //ksp for room annotation processing
 
 }
 
@@ -29,6 +32,12 @@ kotlin {
     }
     
     jvm("desktop")
+
+    // Room step6 part1 for adding ksp src directory to use AppDatabase::class.instantiateImpl() in iosMain:
+    // Due to https://issuetracker.google.com/u/0/issues/342905180
+    sourceSets.commonMain {
+        kotlin.srcDir("build/generated/ksp/metadata")
+    }
 
     sourceSets {
         val desktopMain by getting
@@ -64,6 +73,12 @@ kotlin {
 
             implementation(libs.androidx.core.ktx)
             api(libs.kotlinx.coroutines.core)
+
+
+            //Room step1
+            implementation("androidx.room:room-runtime:2.7.0-beta01")
+            implementation("androidx.sqlite:sqlite-bundled:2.5.0-SNAPSHOT") //for sqlite drivers related
+
         }
 
         desktopMain.dependencies {
@@ -102,13 +117,14 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    dependencies {
+        implementation(libs.androidx.runtime.android)
+        implementation(libs.androidx.bluetooth)
+        debugImplementation(compose.uiTooling)
+    }
+
 }
 
-dependencies {
-    implementation(libs.androidx.runtime.android)
-    implementation(libs.androidx.bluetooth)
-    debugImplementation(compose.uiTooling)
-}
 
 compose.desktop {
     application {
@@ -119,5 +135,25 @@ compose.desktop {
             packageName = "org.kibbcom.tm-x"
             packageVersion = "1.0.0"
         }
+    }
+}
+
+//Room step3: path where we want to generate the schemas
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
+//Room step5  KSP For processing Room annotations , Otherwise we will get Is Room annotation processor correctly configured? error
+dependencies {
+
+    // Update: https://issuetracker.google.com/u/0/issues/342905180
+    add("kspCommonMainMetadata", "androidx.room:room-compiler:2.7.0-alpha04")
+
+}
+
+//Room step6 part 2 make all source sets to depend on kspCommonMainKotlinMetadata:  Update: https://issuetracker.google.com/u/0/issues/342905180
+tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().configureEach {
+    if (name != "kspCommonMainKotlinMetadata" ) {
+        dependsOn("kspCommonMainKotlinMetadata")
     }
 }
