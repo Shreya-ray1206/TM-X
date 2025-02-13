@@ -3,6 +3,8 @@ package appDatabase
 import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import kotlinx.coroutines.Dispatchers
+import org.kibbcom.tm_x.db.AppDatabase
+import org.kibbcom.tm_x.db.dbFileName
 import java.io.File
 
 actual class DBFactory {

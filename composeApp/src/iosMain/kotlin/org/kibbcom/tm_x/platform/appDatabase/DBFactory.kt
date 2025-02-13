@@ -2,12 +2,11 @@ package appDatabase
 
 import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import platform.Foundation.NSHomeDirectory
-
-import appDatabase.instantiateImpl
-import kotlinx.cinterop.ExperimentalForeignApi
+import org.kibbcom.tm_x.db.AppDatabase
+import org.kibbcom.tm_x.db.dbFileName
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask

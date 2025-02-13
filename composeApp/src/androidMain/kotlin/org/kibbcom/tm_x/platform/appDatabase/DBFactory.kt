@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import kotlinx.coroutines.Dispatchers
+import org.kibbcom.tm_x.db.AppDatabase
+import org.kibbcom.tm_x.db.dbFileName
 
 actual class DBFactory(private val context: Context) {
     actual fun createDatabase(): AppDatabase {

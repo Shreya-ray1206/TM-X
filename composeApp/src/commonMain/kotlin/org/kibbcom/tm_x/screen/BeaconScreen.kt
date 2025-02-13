@@ -40,8 +40,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import appDatabase.AppDatabase
-import appDatabase.GithubRepoEntity
+import org.kibbcom.tm_x.db.AppDatabase
 import kotlinx.coroutines.delay
 import org.kibbcom.tm_x.NavigationNewState
 import org.kibbcom.tm_x.Screen
@@ -67,19 +66,9 @@ fun BeaconScreen(db: AppDatabase, navigationState: NavigationNewState, paddingVa
         }
 
 
-        val mydao = db.getDao()
+        val beaconDao = db.getBeaconDao()
 
-      val git1 =   GithubRepoEntity(1,"Mukesh", "5 star","dffffffffff")
-      val git2 =   GithubRepoEntity(2,"Sumit", " 7 star","sdsdddddddddddddddddsd")
 
-        LaunchedEffect(Unit){
-            mydao.insert(git1)
-            delay(2000)
-            mydao.insert(git2)
-            delay(2000)
-            val list = mydao.getAll()
-            println("My data is $list")
-        }
 
 
         var isBeaconEnabled by remember { mutableStateOf(true) }
@@ -91,11 +80,19 @@ fun BeaconScreen(db: AppDatabase, navigationState: NavigationNewState, paddingVa
         val beaconDevices = remember {
             listOf(
                 BeaconDevice("Sony JBL","12:90:889","Bsi23",563359987, 988989,true ),
-                BeaconDevice("TM-X","12:90:889","Bsi23",563359987, 988989, false),
-                BeaconDevice("Sony JBL","12:90:889","Bsi23",563359987, 988989, true),
-                BeaconDevice("TM-X","12:90:889","Bsi23",563359987, 988989, true)
+                BeaconDevice("TM-X","12:90:89","Bsi23",563359987, 988989, false),
+                BeaconDevice("Sony JBL","12:90:8","Bsi23",563359987, 988989, true),
+                BeaconDevice("TM-X","12:90:88889","Bsi23",563359987, 988989, true)
             )
         }
+
+        LaunchedEffect(Unit){
+            beaconDao.insert(beaconDevices)
+            delay(5000)
+            val beaconDeviceFromDb = beaconDao.getAll()
+            println("All Saved List is $beaconDeviceFromDb")
+        }
+
 
         Column (
             modifier = Modifier
