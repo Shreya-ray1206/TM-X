@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.kibbcom.tm_x.ble.BleConnectionStatus
+import org.kibbcom.tm_x.models.BeaconDevice
 import org.kibbcom.tm_x.models.BleDeviceCommon
 import platform.CoreBluetooth.CBCentralManager
 import platform.CoreBluetooth.CBCentralManagerDelegateProtocol
@@ -20,7 +21,7 @@ actual class BleManager actual constructor() : NSObject(), CBCentralManagerDeleg
     private var centralManager: CBCentralManager? = null
     private var discoveredPeripherals = mutableMapOf<String, CBPeripheral>()
     private val _scanResults = MutableStateFlow<List<BleDeviceCommon>>(emptyList())
-    actual val scanResults: StateFlow<List<BleDeviceCommon>> = _scanResults.asStateFlow()
+    actual val bleDevicesScanResults: StateFlow<List<BleDeviceCommon>> = _scanResults.asStateFlow()
     private val _connectionState = MutableStateFlow(BleConnectionStatus.IDLE)
     actual val connectionState = _connectionState.asStateFlow()
 
@@ -28,7 +29,7 @@ actual class BleManager actual constructor() : NSObject(), CBCentralManagerDeleg
         centralManager = CBCentralManager(this, null)
     }
 
-    actual fun scanDevices() {
+    actual fun scanBleDevices() {
         if (centralManager?.state == CBManagerStatePoweredOn) {
             centralManager?.scanForPeripheralsWithServices(null, null)
             println("BLE scanning started...")
@@ -127,7 +128,7 @@ actual class BleManager actual constructor() : NSObject(), CBCentralManagerDeleg
         }
     }
 
-    actual fun stopScanning() {
+    actual fun stopBLEScanning() {
         centralManager?.stopScan()
     }
 
@@ -151,6 +152,12 @@ actual class BleManager actual constructor() : NSObject(), CBCentralManagerDeleg
         characteristicId: String,
         data: ByteArray
     ) {
+    }
+
+    actual val beaconScanResults: StateFlow<List<BeaconDevice>>
+        get() = TODO("Not yet implemented")
+
+    actual fun scanBeaconDevices() {
     }
 
 

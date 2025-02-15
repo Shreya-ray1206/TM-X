@@ -5,7 +5,7 @@ import org.kibbcom.tm_x.ble.BleConnectionStatus
 import org.kibbcom.tm_x.models.BleDeviceCommon
 
 actual class BleManager actual constructor() {
-    actual fun scanDevices() {
+    actual fun scanBleDevices() {
     }
 
     actual fun connectToDevice(deviceId: String) {
@@ -14,12 +14,12 @@ actual class BleManager actual constructor() {
     actual fun bondWithDevice(deviceId: String) {
     }
 
-    actual val scanResults: StateFlow<List<BleDeviceCommon>>
+    actual val bleDevicesScanResults: StateFlow<List<BleDeviceCommon>>
         get() = TODO("Not yet implemented")
     actual val connectionState: StateFlow<BleConnectionStatus>
         get() = TODO("Not yet implemented")
 
-    actual fun stopScanning() {
+    actual fun stopBLEScanning() {
     }
 
     actual fun disConnectToDevice(deviceId: String) {

@@ -25,7 +25,7 @@ class ScanningViewModel() : ViewModel(){
 
     init {
         viewModelScope.launch {
-            bleManager.scanResults.collectLatest { scannedDevices ->
+            bleManager.bleDevicesScanResults.collectLatest { scannedDevices ->
                 _devicesNative.value = scannedDevices
             }
         }
@@ -51,7 +51,7 @@ class ScanningViewModel() : ViewModel(){
 */
     }
     fun scanDevices() {
-        bleManager.scanDevices()
+        bleManager.scanBleDevices()
     }
 
     fun connectToDevice(deviceId: String) {
@@ -59,7 +59,7 @@ class ScanningViewModel() : ViewModel(){
     }
 
     fun stopScanningDevice() {
-        bleManager.stopScanning()
+        bleManager.stopBLEScanning()
     }
 
     fun bondWithDevice(deviceId: String) {

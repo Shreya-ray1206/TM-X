@@ -30,6 +30,7 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,17 +41,24 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import org.kibbcom.tm_x.db.AppDatabase
 import kotlinx.coroutines.delay
 import org.kibbcom.tm_x.NavigationNewState
 import org.kibbcom.tm_x.Screen
 import org.kibbcom.tm_x.models.BeaconDevice
 import org.kibbcom.tm_x.platform.BackHandler
+import org.kibbcom.tm_x.platform.ScanningViewModelFactory
+import org.kibbcom.tm_x.platform.viewmodel.BeaconViewModelFactory
 import org.kibbcom.tm_x.theme.CardBorderColor
+import org.kibbcom.tm_x.viewmodel.BeaconViewModel
+import org.kibbcom.tm_x.viewmodel.ScanningViewModel
 
 
 @Composable
-fun BeaconScreen(db: AppDatabase, navigationState: NavigationNewState, paddingValues: PaddingValues){
+fun BeaconScreen(db: AppDatabase, navigationState: NavigationNewState, paddingValues: PaddingValues,
+                 viewModel: BeaconViewModel = viewModel(factory = BeaconViewModelFactory())
+){
 
 
     Column(
@@ -65,6 +73,12 @@ fun BeaconScreen(db: AppDatabase, navigationState: NavigationNewState, paddingVa
             navigationState.navigateBack()  // Handle back press
         }
 
+        LaunchedEffect(Unit) {
+            viewModel.scanBeaconDevices()
+        }
+
+        val beaconDevice by viewModel.devicesNative.collectAsState()
+
 
         val beaconDao = db.getBeaconDao()
 
@@ -76,13 +90,13 @@ fun BeaconScreen(db: AppDatabase, navigationState: NavigationNewState, paddingVa
         var expanded by remember { mutableStateOf(false) }
         var selectedType by remember { mutableStateOf("Choose Type") }
 
-        // Sample data for beacon devices
+      /*  // Sample data for beacon devices
         val beaconDevices = remember {
             listOf(
-                BeaconDevice("Sony JBL","12:90:889","Bsi23",563359987, 988989,true ),
-                BeaconDevice("TM-X","12:90:89","Bsi23",563359987, 988989, false),
-                BeaconDevice("Sony JBL","12:90:8","Bsi23",563359987, 988989, true),
-                BeaconDevice("TM-X","12:90:88889","Bsi23",563359987, 988989, true)
+                BeaconDevice("Sony JBL","12:90:889","Bsi23" ),
+                BeaconDevice("TM-X","12:90:89","Bsi23"),
+                BeaconDevice("Sony JBL","12:90:8","Bsi23"),
+                BeaconDevice("TM-X","12:90:88889","Bsi23")
             )
         }
 
@@ -92,7 +106,7 @@ fun BeaconScreen(db: AppDatabase, navigationState: NavigationNewState, paddingVa
             val beaconDeviceFromDb = beaconDao.getAll()
             println("All Saved List is $beaconDeviceFromDb")
         }
-
+*/
 
         Column (
             modifier = Modifier
@@ -211,12 +225,13 @@ fun BeaconScreen(db: AppDatabase, navigationState: NavigationNewState, paddingVa
             // Beacon List
 
             LazyColumn {
-                items(beaconDevices) { device ->
+                items(beaconDevice) { device ->
 
                     BeaconItem(device)
 
                 }
             }
+
 
 
         }

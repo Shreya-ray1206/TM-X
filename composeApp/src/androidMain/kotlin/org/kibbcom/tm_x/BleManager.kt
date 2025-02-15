@@ -10,6 +10,7 @@ import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanRecord
 import android.bluetooth.le.ScanResult
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -17,9 +18,12 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
+import androidx.room.PrimaryKey
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.kibbcom.tm_x.ble.BleConnectionStatus
+import org.kibbcom.tm_x.models.BeaconDevice
 import org.kibbcom.tm_x.models.BleDeviceCommon
 import java.util.UUID
 
@@ -36,8 +40,14 @@ actual class BleManager actual constructor() {
 
     private val _connectionState = MutableStateFlow(BleConnectionStatus.IDLE)
     actual val connectionState = _connectionState.asStateFlow()
-    private val _scanResults = MutableStateFlow<List<BleDeviceCommon>>(emptyList())
-    actual val scanResults = _scanResults.asStateFlow()
+    private val _bleDevicesScanResults = MutableStateFlow<List<BleDeviceCommon>>(emptyList())
+    actual val bleDevicesScanResults = _bleDevicesScanResults.asStateFlow()
+
+    private val _beaconScanResults = MutableStateFlow<List<BeaconDevice>>(emptyList())
+    actual val beaconScanResults = _beaconScanResults.asStateFlow()
+
+
+
     private val _readData = MutableStateFlow<Pair<String, ByteArray>?>(null)
     actual val readDataResult = _readData.asStateFlow()
 
@@ -75,7 +85,7 @@ actual class BleManager actual constructor() {
     }
 
     @SuppressLint("MissingPermission")
-    private val scanCallback = object : ScanCallback() {
+    private val bleScanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             super.onScanResult(callbackType, result)
             val device = result.device
@@ -85,8 +95,8 @@ actual class BleManager actual constructor() {
             )
 
             if(newDevice.name?.startsWith("Unknown") == false){
-                val updatedList = _scanResults.value.toMutableList().apply { add(newDevice) }
-                _scanResults.value = updatedList.distinctBy { it.id } // Avoid duplicates
+                val updatedList = _bleDevicesScanResults.value.toMutableList().apply { add(newDevice) }
+                _bleDevicesScanResults.value = updatedList.distinctBy { it.id } // Avoid duplicates
             }
 
         }
@@ -94,16 +104,192 @@ actual class BleManager actual constructor() {
 
 
     @SuppressLint("MissingPermission")
-    actual fun scanDevices() {
-        scanner?.startScan(scanCallback)
+    private val beaconScanCallback = object : ScanCallback() {
+        override fun onScanResult(callbackType: Int, result: ScanResult) {
+            super.onScanResult(callbackType, result)
+            println("Beacon Scan result")
+
+
+            val scanRecord = result.scanRecord ?: return
+            val bytes = scanRecord.bytes ?: return
+
+            val iBeacon = parseIBeacon(scanRecord)
+            val eddystone = parseEddystone(bytes)
+            println("Beacon Scan result $iBeacon")
+            println("Beacon Scan result $eddystone")
+
+            val beaconDevice = when {
+                iBeacon != null -> BeaconDevice(
+                    macAddress = result.device.address,
+                    name = "iBeacon",
+                    rssi ="fdjk",
+                    uuid = iBeacon.uuid,
+                    major = iBeacon.major,
+                    minor = iBeacon.minor
+                )
+                eddystone != null -> BeaconDevice(
+                    macAddress = result.device.address,
+                    name = "Eddystone",
+                    rssi = "endy rssi",
+                    namespace = eddystone.namespace,
+                    instanceId = eddystone.instanceId
+                )
+                else -> return // Ignore non-beacon devices
+            }
+
+            // Update the StateFlow to notify UI
+            val updatedList = _beaconScanResults.value.toMutableList().apply { add(beaconDevice) }
+            _beaconScanResults.value = updatedList.distinctBy { it.macAddress }
+
+        /*   // beacon.manufacturer = result.device.name
+
+            val iBeacon = parseIBeacon(bytes)
+            val eddystone = parseEddystone(bytes)
+            println("Beacon Scan result $iBeacon")
+            println("Beacon Scan result $eddystone")
+            val beaconDevice = when {
+                iBeacon != null -> BeaconDevice(
+                    macAddress = result.device.address,
+                    name = "iBeacon",
+                    rssi = result.rssi.toString(),
+                    major = iBeacon.major,
+                    minor = iBeacon.minor,
+                    uuid = iBeacon.uuid
+                )
+                eddystone != null -> BeaconDevice(
+                    macAddress = result.device.address,
+                    name = "Eddystone",
+                    rssi = result.rssi.toString(),
+                    namespace = eddystone.namespace,
+                    instanceId = eddystone.instanceId
+                )
+                else -> return // Ignore non-beacon devices
+            }
+*/
+            // Update list without duplicates
+
+            _beaconScanResults.value = _beaconScanResults.value.distinctBy { it.macAddress }
+        }
+    }
+
+    private fun convertToUUIDString(uuidBytes: ByteArray): String {
+        val hexString = uuidBytes.joinToString("") { String.format("%02X", it) }
+        return String.format(
+            "%s-%s-%s-%s-%s",
+            hexString.substring(0, 8),
+            hexString.substring(8, 12),
+            hexString.substring(12, 16),
+            hexString.substring(16, 20),
+            hexString.substring(20, 32)
+        )
+    }
+
+
+    data class IBeaconData(val uuid: String, val major: Int, val minor: Int, val txPower: Int)
+
+    private fun parseIBeacon(scanRecord: ScanRecord): IBeaconData? {
+        val manufacturerData = scanRecord.getManufacturerSpecificData(0x004C) ?: return null
+        if (manufacturerData.size < 23) return null
+
+        val uuidBytes = manufacturerData.copyOfRange(2, 18)
+        val uuid = convertToUUIDString(uuidBytes)
+        val major = (manufacturerData[18].toInt() and 0xFF) shl 8 or (manufacturerData[19].toInt() and 0xFF)
+        val minor = (manufacturerData[20].toInt() and 0xFF) shl 8 or (manufacturerData[21].toInt() and 0xFF)
+        val txPower = manufacturerData[22].toInt()
+
+        return IBeaconData(uuid, major, minor, txPower)
+    }
+
+
+    data class EddystoneData(val namespace: String, val instanceId: String)
+
+    private fun parseEddystone(bytes: ByteArray): EddystoneData? {
+        if (bytes.size < 20) return null
+        if (bytes[0] != 0x00.toByte() || bytes[1] != 0x00.toByte()) return null  // Eddystone UID frame check
+
+        val namespace = bytes.copyOfRange(2, 12).joinToString("") { "%02x".format(it) }
+        val instanceId = bytes.copyOfRange(12, 18).joinToString("") { "%02x".format(it) }
+
+        return EddystoneData(namespace, instanceId)
+    }
+
+
+
+    private val leScanCallback: ScanCallback = object : ScanCallback() {
+        override fun onScanResult(callbackType: Int, result: ScanResult) {
+            val scanRecord = result.scanRecord
+
+
+         /*   val beacon = Beacon(result.device.address)
+            beacon.manufacturer = result.device.name
+            beacon.rssi = result.rssi
+            if (scanRecord != null) {
+                val iBeaconManufactureData = scanRecord.getManufacturerSpecificData(0x004C)
+                if (iBeaconManufactureData != null && iBeaconManufactureData.size >= 23) {
+
+                    Log.e("BEACON", "Manufacturer Data: ${iBeaconManufactureData.toHexString()}")
+
+                    val length = iBeaconManufactureData.size
+                    val companyId = 0x004C
+                    val type = iBeaconManufactureData[0].toInt()
+                    val uuidBytes = iBeaconManufactureData.copyOfRange(2, 18)
+                    val iBeaconUUID = convertToUUIDString(uuidBytes)
+                    val major = (iBeaconManufactureData[18].toInt() and 0xFF) shl 8 or (iBeaconManufactureData[19].toInt() and 0xFF)
+                    val minor = (iBeaconManufactureData[20].toInt() and 0xFF) shl 8 or (iBeaconManufactureData[21].toInt() and 0xFF)
+                    // Extract TX power level (calibrated RSSI at 1 meter)
+                    val txPowerCalibratedRSSI = iBeaconManufactureData[22].toInt()
+                    beacon.type = Beacon.beaconType.iBeacon
+                    beacon.uuid = iBeaconUUID
+                    beacon.major = major
+                    beacon.minor = minor
+                    beacon.length = length
+                    beacon.company = companyId
+                    beacon.rssi = txPowerCalibratedRSSI // Store TX power level
+                    beacon.typeId = type.toString()
+
+                    Log.e("BEACON", "iBeaconUUID:$iBeaconUUID rssi: $txPowerCalibratedRSSI major:$major minor:$minor length:$length companyId:0x${companyId.toString(16).uppercase()} type:$type")
+                }
+            }
+
+            if (!beaconSet.contains(beacon)) {
+                beaconSet.add(beacon)
+                Handler(Looper.getMainLooper()).post {
+                    beaconAdapter?.updateData(beaconSet.toList(), beaconTypePositionSelected)
+                }
+            }*/
+        }
+
+        override fun onScanFailed(errorCode: Int) {
+            Log.e("BEACON", errorCode.toString())
+        }
+    }
+
+
+    @SuppressLint("MissingPermission")
+    actual fun scanBleDevices() {
+        scanner?.startScan(bleScanCallback)
         println("BLE scanning started...")
         _connectionState.value = BleConnectionStatus.SCANNING
 
         Handler(Looper.getMainLooper()).postDelayed({
-            scanner?.stopScan(scanCallback)
+            scanner?.stopScan(bleScanCallback)
             println("BLE scanning stopped")
         }, 100000) // Stop scanning after 10 seconds
     }
+
+   @SuppressLint("MissingPermission")
+    actual fun scanBeaconDevices() {
+        scanner?.stopScan(bleScanCallback)
+        scanner?.startScan(beaconScanCallback)
+        println("Beacon  scanning started...")
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            scanner?.stopScan(beaconScanCallback)
+            println("BLE scanning stopped")
+        }, 100000) // Stop scanning after 10 seconds
+    }
+
+
 
 
     @OptIn(ExperimentalStdlibApi::class)
@@ -209,8 +395,8 @@ actual class BleManager actual constructor() {
 
 
     @SuppressLint("MissingPermission")
-    actual fun stopScanning() {
-        scanner?.stopScan(scanCallback)
+    actual fun stopBLEScanning() {
+        scanner?.stopScan(bleScanCallback)
     }
 
     @SuppressLint("MissingPermission")
