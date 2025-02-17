@@ -4,7 +4,6 @@ package org.kibbcom.tm_x
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -21,7 +20,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.kibbcom.tm_x.screen.BeaconScreen
 import org.kibbcom.tm_x.screen.BleScanningScreen
 import org.kibbcom.tm_x.screen.CustomTopBar
-import org.kibbcom.tm_x.screen.DummyScreen
+import org.kibbcom.tm_x.screen.DeviceDetailScreen
+import org.kibbcom.tm_x.screen.SavedBeaconScreen
 import org.kibbcom.tm_x.screen.PermissionScreen
 import org.kibbcom.tm_x.screen.SettingsScreen
 import org.kibbcom.tm_x.theme.TmxAppTheme
@@ -50,8 +50,9 @@ fun App(db: AppDatabase, navigationState: NavigationNewState = remember { Naviga
                 is Screen.Beacon -> BeaconScreen(db,navigationState, paddingValues)
                 is Screen.Settings -> SettingsScreen(navigationState, paddingValues)
                 is Screen.LogScreen -> LogScreen(navigationState, paddingValues)
-                is Screen.Permission -> PermissionScreen(navigationState)
-                is Screen.DummyScreen -> DummyScreen(navigationState,paddingValues)
+                is Screen.Permission -> PermissionScreen(navigationState,paddingValues)
+                is Screen.SavedBeacon -> SavedBeaconScreen(navigationState,paddingValues)
+                is Screen.DeviceDetailScreen -> DeviceDetailScreen(navigationState,paddingValues)
                 else -> {}
             }
         }
@@ -61,7 +62,7 @@ fun App(db: AppDatabase, navigationState: NavigationNewState = remember { Naviga
 
 @Composable
 fun BottomNavigationBar(navigationState: NavigationNewState) {
-    val items = listOf(Screen.BleScanning, Screen.Beacon, Screen.Settings,Screen.LogScreen)
+    val items = listOf(Screen.DeviceDetailScreen,Screen.Settings,Screen.LogScreen)
     val isDarkTheme = isSystemInDarkTheme() // Detect dark mode
 
     NavigationBar(
@@ -73,8 +74,8 @@ fun BottomNavigationBar(navigationState: NavigationNewState) {
                 icon = {
                     Icon(
                         imageVector = when (screen) {
-                            is Screen.BleScanning -> Icons.Outlined.LocationOn
-                            is Screen.Beacon -> Icons.Outlined.LocationOn
+
+
                             is Screen.Settings -> Icons.Outlined.Settings
                             is Screen.LogScreen -> Icons.Outlined.Info
                             else -> Icons.Outlined.Settings
@@ -112,6 +113,7 @@ fun getNameTitle(screen: Screen): String {
         is Screen.BleScanning -> stringResource(Res.string.ble_devices)
         is Screen.Settings -> stringResource(Res.string.settings)
         is Screen.LogScreen -> stringResource(Res.string.logs)
+        is Screen.DeviceDetailScreen -> "Device detail"
         else -> "TMX-Kibbcom"
     }
 }

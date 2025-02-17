@@ -120,7 +120,7 @@ fun BeaconScreen(db: AppDatabase, navigationState: NavigationNewState, paddingVa
                     .fillMaxWidth() // Makes width full screen
                     .wrapContentHeight() // Height adjusts based on content
                     .clip(RoundedCornerShape(18.dp)).clickable {
-                        navigationState.navigateTo(Screen.DummyScreen)
+             //todo
                     }
                     .border(
                         width = 1.dp,

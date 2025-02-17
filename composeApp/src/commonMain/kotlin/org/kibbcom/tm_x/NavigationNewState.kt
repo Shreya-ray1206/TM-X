@@ -9,10 +9,10 @@ class NavigationNewState {
     val currentScreen: Screen get() = _screenStack.last()
 
     val showBottomBar: Boolean
-        get() = currentScreen in listOf(Screen.BleScanning, Screen.Beacon, Screen.Settings,Screen.LogScreen)
+        get() = currentScreen in listOf(Screen.DeviceDetailScreen,Screen.Settings,Screen.LogScreen)
 
     fun navigateTo(screen: Screen) {
-        if (screen in listOf(Screen.BleScanning)) {
+        if (screen in listOf(Screen.Permission)) {
             // Replace the top screen instead of adding to stack
             if (_screenStack.isNotEmpty()) {
                 _screenStack[_screenStack.size - 1] = screen
@@ -30,9 +30,12 @@ class NavigationNewState {
     }
 
     fun navigateBack() {
+
         if (_screenStack.size > 1) {
             _screenStack.removeAt(_screenStack.size - 1) // Safe alternative
         } else {
+
+        navigateTo(Screen.Permission)
 
             //todo
             println("We need to exit from here ")

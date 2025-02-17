@@ -8,6 +8,9 @@ sealed class Screen {
     object Beacon : Screen(){
         override fun toString(): String = "Beacon"
     }
+    object SavedBeacon : Screen(){
+        override fun toString(): String = "SavedBeacon"
+    }
     object BleScanning : Screen(){
         override fun toString(): String = "Scanning"
     }
@@ -22,6 +25,9 @@ sealed class Screen {
     }
     object LogScreen : Screen(){
         override fun toString(): String = "LogScreen"
+    }
+  object DeviceDetailScreen : Screen(){
+        override fun toString(): String = "DeviceDetailScreen"
     }
 
 }

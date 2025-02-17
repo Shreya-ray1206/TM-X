@@ -35,11 +35,13 @@ fun getScreenTitle(screen: Screen): String {
 @Composable
 fun CustomTopBar(navigationState: NavigationNewState) {
     when (navigationState.currentScreen) {
-        is Screen.BleScanning -> DefaultTopBar(getScreenTitle(navigationState.currentScreen))
-        is Screen.Beacon -> DefaultTopBar(getScreenTitle(navigationState.currentScreen))
+        is Screen.BleScanning -> BackTopBar(navigationState,"Devices")
+        is Screen.Beacon -> BackTopBar(navigationState,getScreenTitle(navigationState.currentScreen))
+        is Screen.SavedBeacon -> BackTopBar(navigationState,"Saved Beacon")
         is Screen.Settings -> DefaultTopBar(getScreenTitle(navigationState.currentScreen))
         is Screen.LogScreen -> DefaultTopBar(getScreenTitle(navigationState.currentScreen))
-        is Screen.DummyScreen -> BackTopBar(navigationState,"New Screen") // Special TopBar with a back button
+        is Screen.Permission -> DefaultTopBar(getScreenTitle(navigationState.currentScreen))
+        is Screen.DeviceDetailScreen -> DefaultTopBar(getScreenTitle(navigationState.currentScreen))
         else -> {}
     }
 }

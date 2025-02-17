@@ -128,7 +128,7 @@ fun DeviceItem(device: BleDeviceCommon, navigationState: NavigationNewState) {
             .wrapContentHeight() // Height adjusts based on content
             .clip(RoundedCornerShape(18.dp)).clickable {
 
-                navigationState.navigateTo(Screen.DummyScreen)
+                navigationState.navigateTo(Screen.DeviceDetailScreen)
 //                        //todo for scanning
 //                        viewModel.stopScanningDevice()
 //                        viewModel.bondWithDevice(device.id)
