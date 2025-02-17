@@ -10,6 +10,7 @@ import org.kibbcom.tm_x.db.dbFileName
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
+import org.kibbcom.tm_x.db.instantiateImpl
 
 actual class DBFactory {
     @OptIn(ExperimentalForeignApi::class)
