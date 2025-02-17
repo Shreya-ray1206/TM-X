@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.kibbcom.tm_x.BleManager
+import org.kibbcom.tm_x.db.AppDatabase
 import org.kibbcom.tm_x.models.BeaconDevice
 
 class BeaconViewModel() : ViewModel() {
@@ -27,6 +28,10 @@ class BeaconViewModel() : ViewModel() {
     fun scanBeaconDevices() {
         bleManager.scanBeaconDevices()
     }
-
-
+    fun saveBeacon(device: BeaconDevice) {
+        viewModelScope.launch {
+            // Use db to save the scanned device
+          //  db.getBeaconDao().insert(device)
+        }
+    }
 }

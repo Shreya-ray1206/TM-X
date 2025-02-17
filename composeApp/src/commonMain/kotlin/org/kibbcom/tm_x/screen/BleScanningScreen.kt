@@ -1,9 +1,11 @@
 package org.kibbcom.tm_x.screen
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -12,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,15 +33,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.ktor.utils.io.core.toByteArray
 import kotlinx.coroutines.delay
+import org.jetbrains.compose.resources.painterResource
 import org.kibbcom.tm_x.NavigationNewState
 import org.kibbcom.tm_x.platform.ScanningViewModelFactory
 import org.kibbcom.tm_x.Screen
@@ -45,7 +55,11 @@ import org.kibbcom.tm_x.ble.BleConnectionStatus
 import org.kibbcom.tm_x.models.BleDeviceCommon
 import org.kibbcom.tm_x.platform.BackHandler
 import org.kibbcom.tm_x.theme.CardBorderColor
+import org.kibbcom.tm_x.theme.getToolbarAdditionColor
 import org.kibbcom.tm_x.viewmodel.ScanningViewModel
+import tm_x.composeapp.generated.resources.Res
+import tm_x.composeapp.generated.resources.beacon
+import tm_x.composeapp.generated.resources.bluetooth
 
 
 @Composable
@@ -57,6 +71,65 @@ fun BleScanningScreen(navigationState: NavigationNewState, paddingValues: Paddin
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+        // Top Box with Rounded Bottom Corners
+        var dotCount = remember { mutableStateOf(1) }
+        var isAnimating = remember { mutableStateOf(true) }
+
+        // Run the animation for 10 seconds
+        LaunchedEffect(key1 = isAnimating.value) {
+            var elapsedTime = 0
+            while (elapsedTime < 10_000 && isAnimating.value) { // Stop after 10 seconds (10,000 ms)
+                delay(500)  // 500 ms delay
+                dotCount.value = (dotCount.value % 3) + 1 // Cycle between 1, 2, and 3 dots
+                elapsedTime += 500
+            }
+            isAnimating.value = false // Stop the animation after 10 seconds
+        }
+
+        // Create the "Scanning" text with ellipsis
+        val scanningText = "Scanning${".".repeat(dotCount.value)}"
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp)
+                .shadow(
+                    elevation = 8.dp,
+                    shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
+                    ambientColor = Color.White,
+                    spotColor = Color.White
+                )
+                .clip(RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp))
+                .background(getToolbarAdditionColor())
+        ) {
+
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically // Ensures vertical alignment of Image and Text
+                ){
+
+                    Image(
+                        painter = painterResource(Res.drawable.bluetooth), // Replace with your image resource
+                        contentDescription = "Scanning Icon",
+                        modifier = Modifier
+                            .size(50.dp),
+                        colorFilter = ColorFilter.tint(Color.White) // Apply white tint (optional)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Text(
+                        text = scanningText,
+                        fontSize = 24.sp,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+
+            }
+
+        }
 
         BackHandler {
             navigationState.navigateBack()  // Handle back press
@@ -121,29 +194,21 @@ fun BleScanningScreen(navigationState: NavigationNewState, paddingValues: Paddin
 
 @Composable
 fun DeviceItem(device: BleDeviceCommon, navigationState: NavigationNewState) {
-    Card(
-        modifier = Modifier
-            .padding(10.dp)
-            .fillMaxWidth() // Makes width full screen
-            .wrapContentHeight() // Height adjusts based on content
-            .clip(RoundedCornerShape(18.dp)).clickable {
 
-                navigationState.navigateTo(Screen.DeviceDetailScreen)
+    Card(
+        modifier = Modifier.padding(10.dp).clickable {
+
+            navigationState.navigateTo(Screen.DeviceDetailScreen)
 //                        //todo for scanning
 //                        viewModel.stopScanningDevice()
 //                        viewModel.bondWithDevice(device.id)
-            }
-            .border(
-                width = 1.dp,
-                color = CardBorderColor,
-                shape = RoundedCornerShape(18.dp)
-            ),
+        },
+        shape = RoundedCornerShape(8.dp), // Keep all corners rounded at 25.dp
+        elevation = CardDefaults.cardElevation(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface // Light gray background
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp) // No shadow
-    )
-    {
+            containerColor = MaterialTheme.colorScheme.surfaceVariant // This will now use the theme value
+        )
+    ){
         Row(
             modifier = Modifier
                 .fillMaxSize()
@@ -227,6 +292,30 @@ fun DeviceItem(device: BleDeviceCommon, navigationState: NavigationNewState) {
             }
         }
     }
+
+
+/*
+    Card(
+        modifier = Modifier
+            .padding(10.dp)
+            .fillMaxWidth() // Makes width full screen
+            .wrapContentHeight() // Height adjusts based on content
+            .clip(RoundedCornerShape(18.dp)).clickable {
+
+            }
+            .border(
+                width = 1.dp,
+                color = CardBorderColor,
+                shape = RoundedCornerShape(18.dp)
+            ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface // Light gray background
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp) // No shadow
+    )
+    {
+
+    }*/
 }
 
 

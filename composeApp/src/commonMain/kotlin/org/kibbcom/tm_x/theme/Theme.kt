@@ -5,6 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import org.kibbcom.tm_x.platform.setStatusBarColor
 
 @Composable
@@ -17,14 +18,16 @@ fun TmxAppTheme(
             primary = darkPrimaryGrey,
             secondary = secondaryGrey,
             background = darkBackground,
-            surface = darkSurface
+            surface = darkSurface,
+            surfaceVariant = darkSurfaceVarient
         )
     } else {
         lightColorScheme(
             primary = lightPrimaryBlue,  // Green top bar
             secondary = lightDarkBlue,
             background = lightAppBackGround,
-            surface = lightSurface
+            surface = lightSurface,
+            onSurfaceVariant = lightSurfaceVarient
 
 
         )
@@ -42,3 +45,12 @@ fun TmxAppTheme(
         content = content
     )
 }
+
+@Composable
+fun getToolbarAdditionColor(): Color {
+    val darkTheme: Boolean = isSystemInDarkTheme()
+
+    return if (darkTheme) darkPrimaryGrey else lightPrimaryBlue
+}
+
+

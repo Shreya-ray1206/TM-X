@@ -1,9 +1,9 @@
 package org.kibbcom.tm_x.screen
 
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,8 +14,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -25,12 +25,9 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,21 +35,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.kibbcom.tm_x.db.AppDatabase
 import kotlinx.coroutines.delay
+import org.jetbrains.compose.resources.painterResource
 import org.kibbcom.tm_x.NavigationNewState
-import org.kibbcom.tm_x.Screen
+import org.kibbcom.tm_x.db.BeaconDao
 import org.kibbcom.tm_x.models.BeaconDevice
 import org.kibbcom.tm_x.platform.BackHandler
-import org.kibbcom.tm_x.platform.ScanningViewModelFactory
 import org.kibbcom.tm_x.platform.viewmodel.BeaconViewModelFactory
-import org.kibbcom.tm_x.theme.CardBorderColor
+import org.kibbcom.tm_x.theme.getToolbarAdditionColor
 import org.kibbcom.tm_x.viewmodel.BeaconViewModel
-import org.kibbcom.tm_x.viewmodel.ScanningViewModel
+import tm_x.composeapp.generated.resources.Res
+import tm_x.composeapp.generated.resources.beacon
 
 
 @Composable
@@ -67,6 +69,69 @@ fun BeaconScreen(db: AppDatabase, navigationState: NavigationNewState, paddingVa
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        val rotationDegree = animateFloatAsState(
+            targetValue = 360f, // Rotate to 360 degrees
+            animationSpec = tween(durationMillis = 5000, easing = androidx.compose.animation.core.FastOutSlowInEasing)
+        )
+
+        var dotCount = remember { mutableStateOf(1) }
+        var isAnimating = remember { mutableStateOf(true) }
+
+        // Run the animation for 10 seconds
+        LaunchedEffect(key1 = isAnimating.value) {
+            var elapsedTime = 0
+            while (elapsedTime < 10_000 && isAnimating.value) { // Stop after 10 seconds (10,000 ms)
+                delay(500)  // 500 ms delay
+                dotCount.value = (dotCount.value % 3) + 1 // Cycle between 1, 2, and 3 dots
+                elapsedTime += 500
+            }
+            isAnimating.value = false // Stop the animation after 10 seconds
+        }
+
+        // Create the "Scanning" text with ellipsis
+        val scanningText = "Scanning${".".repeat(dotCount.value)}"
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp)
+                .shadow(
+                    elevation = 8.dp,
+                    shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
+                    ambientColor = Color.White,
+                    spotColor = Color.White
+                )
+                .clip(RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp))
+                .background(getToolbarAdditionColor())
+        ) {
+
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically // Ensures vertical alignment of Image and Text
+                ){
+
+                    Image(
+                        painter = painterResource(Res.drawable.beacon), // Replace with your image resource
+                        contentDescription = "Scanning Icon",
+                        modifier = Modifier
+                            .size(50.dp)
+                            .rotate(rotationDegree.value), // Apply rotation
+                        colorFilter = ColorFilter.tint(Color.White) // Apply white tint (optional)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Text(
+                        text = scanningText,
+                        fontSize = 24.sp,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+
+            }
+
+        }
 
 
         BackHandler {
@@ -77,181 +142,50 @@ fun BeaconScreen(db: AppDatabase, navigationState: NavigationNewState, paddingVa
             viewModel.scanBeaconDevices()
         }
 
-        val beaconDevice by viewModel.devicesNative.collectAsState()
+      //  val beaconDevice by viewModel.devicesNative.collectAsState()
 
 
         val beaconDao = db.getBeaconDao()
 
 
 
-
-        var isBeaconEnabled by remember { mutableStateOf(true) }
-        var isScanning by remember { mutableStateOf(false) }
-        var expanded by remember { mutableStateOf(false) }
-        var selectedType by remember { mutableStateOf("Choose Type") }
-
-      /*  // Sample data for beacon devices
-        val beaconDevices = remember {
+        val beaconDevice = remember {
             listOf(
-                BeaconDevice("Sony JBL","12:90:889","Bsi23" ),
-                BeaconDevice("TM-X","12:90:89","Bsi23"),
-                BeaconDevice("Sony JBL","12:90:8","Bsi23"),
-                BeaconDevice("TM-X","12:90:88889","Bsi23")
+                BeaconDevice("Sony JBL","12:90:889","RSSI-8" ),
+                BeaconDevice("TM-4","12:90:89","RSSI-1"),
+                BeaconDevice("OnePlus JBL","12:90:8","RSSI-4"),
+                BeaconDevice("TM-3","12:90:88889","RSSI-2"),
+                BeaconDevice("TM-5","12:420:75:88889","RSSI-11"),
+                BeaconDevice("TM-7","12:45:120:88889","RSSI-12"),
+                BeaconDevice("TM-9","12:15:145:889","RSSI-0")
             )
         }
 
-        LaunchedEffect(Unit){
-            beaconDao.insert(beaconDevices)
-            delay(5000)
-            val beaconDeviceFromDb = beaconDao.getAll()
-            println("All Saved List is $beaconDeviceFromDb")
-        }
-*/
-
-        Column (
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            // Beacon Control Card
-            Card(
-                modifier = Modifier
-                    .padding(10.dp)
-                    .fillMaxWidth() // Makes width full screen
-                    .wrapContentHeight() // Height adjusts based on content
-                    .clip(RoundedCornerShape(18.dp)).clickable {
-             //todo
-                    }
-                    .border(
-                        width = 1.dp,
-                        color = CardBorderColor,
-                        shape = RoundedCornerShape(18.dp)
-                    ),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface // Light gray background
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp) // No shadow
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .background(color = Color.Transparent),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-
-                    ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-/*
-
-                        Image(
-                            painter = painterResource(Res.drawable.compose-multiplatform),
-                            contentDescription = "My Image",
-                            modifier = Modifier
-                                .size(50.dp)
-
-                            )
-*/
 
 
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Text(
-                            text = "Beacon",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
+        LazyColumn {
+            items(beaconDevice) { device ->
 
-
-                    Switch(
-                        checked = isBeaconEnabled,
-                        onCheckedChange = { isBeaconEnabled = it },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = MaterialTheme.colorScheme.secondary, // Blue thumb
-                            checkedTrackColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f), // Light blue track
-                            uncheckedThumbColor = Color.Gray, // Gray thumb when unchecked
-                            uncheckedTrackColor = Color.LightGray // Light gray track when unchecked
-                        )
-                    )
-                }
-            }
-
-            if (isScanning) {
-                Button(
-                    onClick = { /* Handle connect */ },
-                    enabled = false,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary, // Blue button in M3
-                        contentColor = Color.White // White text
-                    ),
-                    modifier = Modifier.wrapContentWidth()
-                ){
-                    Text("Stop Scanning")
-                }
-            }
-
-            // Buttons for type selection
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-
-
-                Button(
-                    onClick = {  selectedType = "Eddy Stone" },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (selectedType == "Eddy Stone") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
-                        contentColor = Color.White // White text
-                    ),
-                    modifier = Modifier.weight(1f)
-                ){
-                    Text("Eddy Stone")
-                }
-
-                Button(
-                    onClick = {  selectedType = "Beacon" },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (selectedType == "Beacon") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
-                        contentColor = Color.White // White text
-                    ),
-                    modifier = Modifier.weight(1f)
-                ){
-                    Text("Beacon")
-                }
+                BeaconItem(device,beaconDao)
 
             }
-
-            // Beacon List
-
-            LazyColumn {
-                items(beaconDevice) { device ->
-
-                    BeaconItem(device)
-
-                }
-            }
-
-
-
         }
     }
 }
 
 
 @Composable
-fun BeaconItem(beacon: BeaconDevice) {
+fun BeaconItem(beacon: BeaconDevice, beaconDao: BeaconDao) {
     var isSaved by remember { mutableStateOf(false) }
+
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-       colors = CardDefaults.cardColors(
-           containerColor = MaterialTheme.colorScheme.surface,
-        ),
-        border = BorderStroke(1.dp, Color.Gray),
-        shape = RoundedCornerShape(12.dp)
-    ) {
+        modifier = Modifier.padding(10.dp),
+        shape = RoundedCornerShape(8.dp), // Keep all corners rounded at 25.dp
+        elevation = CardDefaults.cardElevation(8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant // This will now use the theme value
+        )
+    ){
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -297,21 +231,32 @@ fun BeaconItem(beacon: BeaconDevice) {
                     modifier = Modifier.weight(1f),
                     contentAlignment = Alignment.CenterEnd
                 ) {
-                    Button(
 
+                    var isDbSaved  by remember { mutableStateOf(false) }
+
+
+                    // Connect Button
+                    Button(
                         onClick = {
-                            isSaved = true
+                            isDbSaved = true
                         },
+                        enabled = !isDbSaved,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.secondary, // Blue button in M3
                             contentColor = Color.White // White text
                         ),
-                        shape = RoundedCornerShape(5.dp)
+                        modifier = Modifier.wrapContentWidth()
                     ) {
-                        Text(text = "Save", color = Color.White)
+                        Text(
+                            text = if (isDbSaved) "Saved" else "Save",
+                            color = if (isDbSaved) Color(0xFF88D66C) else Color.White
+                        )
                     }
+
                 }
             }
         }
     }
+
+
 }

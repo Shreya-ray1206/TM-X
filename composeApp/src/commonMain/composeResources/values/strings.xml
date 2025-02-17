@@ -8,4 +8,17 @@
     <string name = "ble_devices">Devices</string>
     <string name = "beacon_devices">Beacon</string>
     <string name = "logs">Logs</string>
+    <string name = "all_granted">All required permissions granted!</string>
+    <string name = "some_permission_missing">One or more permissions were permanently denied.!</string>
+    <string name = "turn_on_ble">Please turn on Bluetooth.</string>
+    <string name = "turn_on_loc">Please turn on Location for BLE scanning.</string>
+    <string name = "permission_required">Permissions are required for BLE scanning.</string>
+    <string name = "permission_messages">Bluetooth permissions needed and bluetooth should be turned on  to use this app.</string>
+    <string name = "scan_ble">Scan BLE</string>
+    <string name = "scan_beacon">Scan Beacon</string>
+    <string name = "last_connected">Last Connected</string>
+    <string name = "saved_beacon">Saved Beacon</string>
+    <string name = "user_manual">User Manual</string>
+    <string name = "version_info">Version Info</string>
+    <string name = "copyright">Copyright ©2025</string>
 </resources>

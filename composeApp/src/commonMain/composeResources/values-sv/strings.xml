@@ -7,5 +7,21 @@
     <string name="settings">Inställningar</string>
     <string name="ble_devices">BLE-enheter</string>
     <string name="beacon_devices">Fyr-enheter</string>
+    <string name = "logs">Logs</string>
+    <string name="all_granted">Alla nödvändiga behörigheter beviljade!</string>
+    <string name="some_permission_missing">En eller flera behörigheter nekades permanent.!</string>
+    <string name="turn_on_ble">Vänligen slå på Bluetooth.</string>
+    <string name="turn_on_loc">Vänligen slå på platsåtkomst för BLE-skanning.</string>
+    <string name="permission_required">Behörigheter krävs för BLE-skanning.</string>
+    <string name="permission_messages">Bluetooth-behörigheter behövs och Bluetooth måste vara påslaget för att använda denna app.</string>
+    <string name="scan_ble">Skanna BLE</string>
+    <string name="scan_beacon">Skanna Beacon</string>
+    <string name="last_connected">Senast ansluten</string>
+    <string name="saved_beacon">Sparad Beacon</string>
+    <string name="user_manual">Användarmanual</string>
+    <string name="version_info">Versionsinformation</string>
+    <string name="copyright">Upphovsrätt ©2025</string>
+
+
 
 </resources>

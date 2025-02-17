@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import org.jetbrains.compose.resources.stringResource
 import org.kibbcom.tm_x.NavigationNewState
 import org.kibbcom.tm_x.Screen
@@ -64,7 +65,11 @@ fun BackTopBar(navigationState: NavigationNewState,title: String) {
         title = { Text(title, color = primaryWhite) },
         navigationIcon = {
             IconButton(onClick = {navigationState.navigateBack()}) {
-                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color.White // Explicitly setting the tint color
+                )
             }
         },
         colors = TopAppBarDefaults.mediumTopAppBarColors(

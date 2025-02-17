@@ -3,7 +3,6 @@ package org.kibbcom.tm_x.screen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -36,15 +37,31 @@ import dev.icerock.moko.permissions.PermissionState
 import dev.icerock.moko.permissions.PermissionsController
 import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.kibbcom.tm_x.NavigationNewState
 import org.kibbcom.tm_x.Screen
 import org.kibbcom.tm_x.platform.PlatformUtils
-import org.kibbcom.tm_x.theme.darkPrimaryGrey
-import org.kibbcom.tm_x.theme.lightPrimaryBlue
+import org.kibbcom.tm_x.theme.getToolbarAdditionColor
+import org.kibbcom.tm_x.theme.primaryWhite
 import org.kibbcom.tm_x.viewmodel.PermissionsViewModel
 import tm_x.composeapp.generated.resources.Res
+import tm_x.composeapp.generated.resources.all_granted
+import tm_x.composeapp.generated.resources.beacon
+import tm_x.composeapp.generated.resources.ble_devices
 import tm_x.composeapp.generated.resources.bluetooth
+import tm_x.composeapp.generated.resources.last_connected
+import tm_x.composeapp.generated.resources.permission_messages
+import tm_x.composeapp.generated.resources.permission_required
+import tm_x.composeapp.generated.resources.saved_beacon
+import tm_x.composeapp.generated.resources.scan_beacon
+import tm_x.composeapp.generated.resources.scan_ble
+import tm_x.composeapp.generated.resources.some_permission_missing
+import tm_x.composeapp.generated.resources.turn_on_ble
+import tm_x.composeapp.generated.resources.turn_on_loc
+import tm_x.composeapp.generated.resources.user_manual
+import tm_x.composeapp.generated.resources.version_info
 
 
 @Composable
@@ -218,15 +235,12 @@ fun PermissionUI(
     navigationState: NavigationNewState
 
 ) {
+    val appVersion = "1.0.0"
     Column(
         modifier = Modifier.fillMaxSize().padding(paddingValues),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-        val darkTheme: Boolean = isSystemInDarkTheme()
-
-        val backgroundColor = if (darkTheme) darkPrimaryGrey else lightPrimaryBlue
 
 
         // Top Box with Rounded Bottom Corners
@@ -241,72 +255,82 @@ fun PermissionUI(
                     spotColor = Color.White
                 )
                 .clip(RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp))
-                .background(backgroundColor) // Change to darkPrimaryGrey if needed
+                .background(getToolbarAdditionColor()) // Change to darkPrimaryGrey if needed
         ) {
 
-            when {
-                // ✅ BLE Permissions Granted & Bluetooth is ON
-                viewModel.bleScanPermissionState == PermissionState.Granted &&
-                        viewModel.bleConnectPermissionState == PermissionState.Granted &&
-                        viewModel.isBluetoothEnabled -> {
-                    PermissionRow(
-                        message = "All required permissions granted!",
-                    )
-                }
+            if(isAndroid){
+                when {
+                    // ✅ BLE Permissions Granted & Bluetooth is ON
+                    viewModel.bleScanPermissionState == PermissionState.Granted &&
+                            viewModel.bleConnectPermissionState == PermissionState.Granted &&
+                            viewModel.isBluetoothEnabled -> {
+                        PermissionRow(
+                            message = stringResource(Res.string.all_granted)
+                        )
+                    }
 
-                // ✅ On Android <12, also check Location permission & status
-                isAndroid && version < 31 &&
-                        viewModel.bleScanPermissionState == PermissionState.Granted &&
-                        viewModel.locationPermissionState == PermissionState.Granted &&
-                        viewModel.isBluetoothEnabled &&
-                        viewModel.isLocationEnabled -> {
-                    PermissionRow(
-                        message = "All required permissions granted!",
-                    )
-                }
+                    // ✅ On Android <12, also check Location permission & status
+                    isAndroid && version < 31 &&
+                            viewModel.bleScanPermissionState == PermissionState.Granted &&
+                            viewModel.locationPermissionState == PermissionState.Granted &&
+                            viewModel.isBluetoothEnabled &&
+                            viewModel.isLocationEnabled -> {
+                        PermissionRow(
+                            message = stringResource(Res.string.all_granted),
 
-                // ❌ Any permission permanently denied
-                viewModel.bleScanPermissionState == PermissionState.DeniedAlways ||
-                        viewModel.bleConnectPermissionState == PermissionState.DeniedAlways ||
-                        viewModel.locationPermissionState == PermissionState.DeniedAlways -> {
-                    PermissionRow(
-                        message = "One or more permissions were permanently denied.",
-                        buttonText = "Open App Settings"
-                    ) {
-                        controller.openAppSettings()
+                        )
+                    }
+
+                    // ❌ Any permission permanently denied
+                    viewModel.bleScanPermissionState == PermissionState.DeniedAlways ||
+                            viewModel.bleConnectPermissionState == PermissionState.DeniedAlways ||
+                            viewModel.locationPermissionState == PermissionState.DeniedAlways -> {
+                        PermissionRow(
+                            message =stringResource(Res.string.some_permission_missing),
+                            buttonText = "Open App Settings"
+                        ) {
+                            controller.openAppSettings()
+                        }
+                    }
+
+                    // ❌ Bluetooth is OFF
+                    !viewModel.isBluetoothEnabled -> {
+                        PermissionRow(
+                            message = stringResource(Res.string.turn_on_ble),
+                            buttonText = "Enable Bluetooth"
+                        ) {
+                            // viewModel.enableBluetooth() // Call method to enable Bluetooth
+                        }
+                    }
+
+                    // ❌ On Android <12 and Location is OFF
+                    isAndroid && version < 31 && !viewModel.isLocationEnabled -> {
+                        PermissionRow(
+                            message = stringResource(Res.string.turn_on_loc),
+
+                            buttonText = "Enable Location"
+                        ) {
+                            // viewModel.enableLocation() // Call method to enable Location
+                        }
+                    }
+
+                    // ❌ Permissions are not yet granted
+                    else -> {
+                        PermissionRow(
+                            message = stringResource(Res.string.permission_required),
+
+                            buttonText = "Request BLE Permissions"
+                        ) {
+                            viewModel.provideOrRequestPermissions()
+                        }
                     }
                 }
-
-                // ❌ Bluetooth is OFF
-                !viewModel.isBluetoothEnabled -> {
-                    PermissionRow(
-                        message = "Please turn on Bluetooth.",
-                        buttonText = "Enable Bluetooth"
-                    ) {
-                        // viewModel.enableBluetooth() // Call method to enable Bluetooth
-                    }
-                }
-
-                // ❌ On Android <12 and Location is OFF
-                isAndroid && version < 31 && !viewModel.isLocationEnabled -> {
-                    PermissionRow(
-                        message = "Please turn on Location for BLE scanning.",
-                        buttonText = "Enable Location"
-                    ) {
-                        // viewModel.enableLocation() // Call method to enable Location
-                    }
-                }
-
-                // ❌ Permissions are not yet granted
-                else -> {
-                    PermissionRow(
-                        message = "Permissions are required for BLE scanning.",
-                        buttonText = "Request BLE Permissions"
-                    ) {
-                        viewModel.provideOrRequestPermissions()
-                    }
-                }
+            }else{
+                PermissionRow(
+                    message = stringResource(Res.string.permission_messages)
+                )
             }
+
 
         }
 
@@ -316,16 +340,19 @@ fun PermissionUI(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            val ble_scan = Color(0xFFafcaff)
+            val beacon_scan = Color(0xFFdaf0fb)
+            val last_connected = Color(0xFFf9fee0)
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                CardItem("Scan BLE", Modifier.weight(1f)) {
+                CardItem(stringResource(Res.string.scan_ble), resource = Res.drawable.bluetooth, moreText = "Scan nearby ble devices", modifier = Modifier.weight(1f), color = ble_scan) {
                     navigationState.navigateTo(Screen.BleScanning)
                 }
 
-                CardItem("Scan Beacon", Modifier.weight(1f)) {
+                CardItem(stringResource(Res.string.scan_beacon), resource = Res.drawable.beacon, moreText = "Scan nearby beacons", modifier = Modifier.weight(1f), color = beacon_scan) {
                     navigationState.navigateTo(Screen.Beacon)
                 }
             }
@@ -334,22 +361,74 @@ fun PermissionUI(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                CardItem("Last Connected", Modifier.weight(1f)) {
+                CardItem(stringResource(Res.string.saved_beacon), resource = Res.drawable.beacon, moreText = "All the saved beacons.", modifier = Modifier.weight(1f), color = beacon_scan) {
+                    navigationState.navigateTo(Screen.SavedBeacon)
+                }
+
+                CardItem(stringResource(Res.string.last_connected), resource = Res.drawable.bluetooth, moreText = "Ctek Njord 1.2.6", modifier = Modifier.weight(1f), color = last_connected) {
                     println("Last Connected clicked!")
                 }
 
-                CardItem("Saved Beacon", Modifier.weight(1f)) {
-                    navigationState.navigateTo(Screen.SavedBeacon)
-                }
+
             }
         }
+
+
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter) // Apply alignment here inside Box
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                Text(
+                    text = stringResource(Res.string.user_manual),
+                   style = MaterialTheme.typography.headlineSmall.copy(
+                        textDecoration = TextDecoration.Underline
+                    ),
+                    modifier = Modifier.clickable { println("User Manual clicked!") }
+                )
+
+                Text(
+                    text = "TM-X Info",
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        textDecoration = TextDecoration.Underline
+                    ),
+                    modifier = Modifier.clickable { println("Team Info clicked!") }
+                )
+                Spacer(Modifier.height(2.dp))
+                val versionTitle  = stringResource(Res.string.version_info)
+                Text(
+                    text = "$versionTitle :-$appVersion",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray
+                )
+                Spacer(Modifier.height(5.dp))
+
+                Text(
+                    text = "Copyright ©2025 Kibbcom India Pvt Ltd.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray
+                )
+            }
+        }
+
+
     }
 }
 
 @Composable
-fun CardItem(title: String, modifier: Modifier,onClick: () -> Unit) {
+fun CardItem(title: String,
+             moreText : String? = null,
+             resource: DrawableResource,
+             modifier: Modifier,
+             color: Color,onClick: () -> Unit) {
     Card(
-        modifier = modifier.height(100.dp) .clickable { onClick() },
+        modifier = modifier.height(120.dp) .clickable { onClick() },
         shape = RoundedCornerShape(8.dp), // Keep all corners rounded at 25.dp
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
@@ -358,20 +437,42 @@ fun CardItem(title: String, modifier: Modifier,onClick: () -> Unit) {
             contentAlignment = Alignment.Center
         ) {
             // Title in Center
-            Text(text = title, color = Color.White)
+
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(8.dp)
+            ) {
+                // "More text" positioned above the main title
+                moreText?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.labelSmall
+                         // Add some space between the texts
+                    )
+                }
+
+
+                // Title at the bottom-left
+                Text(
+                    text = title,
+                    color = color
+                )
+            }
+
 
             // Circular Overlay at Top-Right Corner
             Box(
                 modifier = Modifier
-                    .size(50.dp) // Size of the circle
+                    .size(60.dp) // Size of the circle
                     .offset(x = 10.dp, y = -10.dp) // Position it slightly outside the card
                     .clip(CircleShape) // Keep the white overlay circular
-                    .background(Color.White)
+                    .background(color)
                     .align(Alignment.TopEnd), // Position at top-right
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(Res.drawable.bluetooth), // Replace with your image
+                    painter = painterResource(resource), // Replace with your image
                     contentDescription = "Card Icon",
                     modifier = Modifier.size(40.dp).padding(8.dp) // Image inside the circle
                 )
@@ -401,6 +502,9 @@ fun PermissionRow(message: String, buttonText: String? = null, onClick: (() -> U
         }
     }
 }
+
+
+
 
 
 
