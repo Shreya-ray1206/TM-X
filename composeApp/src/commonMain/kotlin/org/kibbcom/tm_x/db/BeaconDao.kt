@@ -28,5 +28,8 @@ interface BeaconDao {
     @Query("SELECT count(*) FROM BeaconDevice")
     suspend fun count(): Int
 
+    @Query("DELETE FROM BeaconDevice WHERE macAddress = :macAddress")
+    suspend fun deleteByMacAddress(macAddress: String)
+
 }
 

@@ -11,10 +11,14 @@ import org.kibbcom.tm_x.BleManager
 import org.kibbcom.tm_x.db.AppDatabase
 import org.kibbcom.tm_x.models.BeaconDevice
 
-class BeaconViewModel() : ViewModel() {
+class BeaconViewModel(private val db: AppDatabase) : ViewModel() {
     private val bleManager = BleManager()
+
     private val _beaconDevices = MutableStateFlow<List<BeaconDevice>>(emptyList())
     val devicesNative: StateFlow<List<BeaconDevice>> = _beaconDevices.asStateFlow()
+
+    private val _savedBeacons = MutableStateFlow<List<BeaconDevice>>(emptyList())
+    val savedBeacons: StateFlow<List<BeaconDevice>> = _savedBeacons.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -23,15 +27,31 @@ class BeaconViewModel() : ViewModel() {
             }
         }
 
+        // Load saved beacons from the database when ViewModel initializes
+        viewModelScope.launch {
+            _savedBeacons.value = db.getBeaconDao().getAll()
+        }
     }
 
     fun scanBeaconDevices() {
         bleManager.scanBeaconDevices()
     }
+
     fun saveBeacon(device: BeaconDevice) {
         viewModelScope.launch {
-            // Use db to save the scanned device
-          //  db.getBeaconDao().insert(device)
+            db.getBeaconDao().insert(device)
+            // Refresh saved beacons list
+            _savedBeacons.value = db.getBeaconDao().getAll()
         }
     }
+    fun removeBeacon(device: BeaconDevice) {
+        viewModelScope.launch {
+            db.getBeaconDao().deleteByMacAddress(device.macAddress)
+            // Refresh saved beacons list
+            _savedBeacons.value = db.getBeaconDao().getAll()
+        }
+    }
+
+
 }
+

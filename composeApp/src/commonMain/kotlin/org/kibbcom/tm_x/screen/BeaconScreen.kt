@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,7 +48,6 @@ import org.kibbcom.tm_x.db.AppDatabase
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 import org.kibbcom.tm_x.NavigationNewState
-import org.kibbcom.tm_x.db.BeaconDao
 import org.kibbcom.tm_x.models.BeaconDevice
 import org.kibbcom.tm_x.platform.BackHandler
 import org.kibbcom.tm_x.platform.viewmodel.BeaconViewModelFactory
@@ -59,7 +59,7 @@ import tm_x.composeapp.generated.resources.beacon
 
 @Composable
 fun BeaconScreen(db: AppDatabase, navigationState: NavigationNewState, paddingValues: PaddingValues,
-                 viewModel: BeaconViewModel = viewModel(factory = BeaconViewModelFactory())
+                 viewModel: BeaconViewModel = viewModel(factory = BeaconViewModelFactory(db))
 ){
 
 
@@ -116,16 +116,15 @@ fun BeaconScreen(db: AppDatabase, navigationState: NavigationNewState, paddingVa
                         painter = painterResource(Res.drawable.beacon), // Replace with your image resource
                         contentDescription = "Scanning Icon",
                         modifier = Modifier
-                            .size(50.dp)
+                            .size(50.dp).padding(5.dp)
                             .rotate(rotationDegree.value), // Apply rotation
                         colorFilter = ColorFilter.tint(Color.White) // Apply white tint (optional)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
 
                     Text(
                         text = scanningText,
-                        fontSize = 24.sp,
-                        style = MaterialTheme.typography.bodySmall,
+                        fontSize = 16.sp,
+                        style = MaterialTheme.typography.titleSmall,
                     )
                 }
 
@@ -166,7 +165,7 @@ fun BeaconScreen(db: AppDatabase, navigationState: NavigationNewState, paddingVa
         LazyColumn {
             items(beaconDevice) { device ->
 
-                BeaconItem(device,beaconDao)
+                BeaconItem(device,viewModel)
 
             }
         }
@@ -175,8 +174,13 @@ fun BeaconScreen(db: AppDatabase, navigationState: NavigationNewState, paddingVa
 
 
 @Composable
-fun BeaconItem(beacon: BeaconDevice, beaconDao: BeaconDao) {
-    var isSaved by remember { mutableStateOf(false) }
+fun BeaconItem(beacon: BeaconDevice, viewModel: BeaconViewModel) {
+
+
+    val savedBeacons by viewModel.savedBeacons.collectAsState()
+
+    val isDbSaved = savedBeacons.any { it.macAddress == beacon.macAddress } // Check if beacon is saved
+
 
     Card(
         modifier = Modifier.padding(10.dp),
@@ -232,13 +236,13 @@ fun BeaconItem(beacon: BeaconDevice, beaconDao: BeaconDao) {
                     contentAlignment = Alignment.CenterEnd
                 ) {
 
-                    var isDbSaved  by remember { mutableStateOf(false) }
 
 
                     // Connect Button
                     Button(
                         onClick = {
-                            isDbSaved = true
+                            viewModel.saveBeacon(beacon)
+
                         },
                         enabled = !isDbSaved,
                         colors = ButtonDefaults.buttonColors(

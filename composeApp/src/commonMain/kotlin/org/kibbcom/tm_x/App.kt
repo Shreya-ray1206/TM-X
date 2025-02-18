@@ -51,7 +51,7 @@ fun App(db: AppDatabase, navigationState: NavigationNewState = remember { Naviga
                 is Screen.Settings -> SettingsScreen(navigationState, paddingValues)
                 is Screen.LogScreen -> LogScreen(navigationState, paddingValues)
                 is Screen.Permission -> PermissionScreen(navigationState,paddingValues)
-                is Screen.SavedBeacon -> SavedBeaconScreen(navigationState,paddingValues)
+                is Screen.SavedBeacon -> SavedBeaconScreen(db,navigationState,paddingValues)
                 is Screen.DeviceDetailScreen -> DeviceDetailScreen(navigationState,paddingValues)
                 else -> {}
             }
