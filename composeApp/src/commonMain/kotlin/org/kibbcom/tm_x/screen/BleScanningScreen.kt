@@ -71,6 +71,19 @@ fun BleScanningScreen(navigationState: NavigationNewState, paddingValues: Paddin
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        BackHandler {
+            navigationState.navigateBack()  // Handle back press
+        }
+
+        // Start scanning when the screen is composed
+        LaunchedEffect(Unit) {
+            viewModel.scanDevices()
+        }
+
+        val devicesNative by viewModel.devicesNative.collectAsState()
+        val connectionState by viewModel.connectionState.collectAsState()
+
+
 
         // Top Box with Rounded Bottom Corners
         var dotCount = remember { mutableStateOf(1) }
@@ -111,19 +124,27 @@ fun BleScanningScreen(navigationState: NavigationNewState, paddingValues: Paddin
                     verticalAlignment = Alignment.CenterVertically // Ensures vertical alignment of Image and Text
                 ){
 
+
                     Image(
                         painter = painterResource(Res.drawable.bluetooth), // Replace with your image resource
                         contentDescription = "Scanning Icon",
                         modifier = Modifier
-                            .size(50.dp),
+                            .size(50.dp).padding(5.dp),
                         colorFilter = ColorFilter.tint(Color.White) // Apply white tint (optional)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
 
                     Text(
-                        text = scanningText,
-                        fontSize = 24.sp,
-                        style = MaterialTheme.typography.bodySmall,
+                        text =  when (connectionState) {
+                            BleConnectionStatus.IDLE -> "Idle"
+                            BleConnectionStatus.SCANNING -> scanningText
+                            BleConnectionStatus.BONDING -> "Bonding..."
+                            BleConnectionStatus.CONNECTING -> "Connecting..."
+                            BleConnectionStatus.CONNECTED -> "Connected"
+                            BleConnectionStatus.DISCONNECTED -> "Disconnected"
+                            else -> "Unknown State"
+                        },
+                        fontSize = 16.sp,
+                        style = MaterialTheme.typography.titleSmall,
                     )
                 }
 
@@ -131,17 +152,7 @@ fun BleScanningScreen(navigationState: NavigationNewState, paddingValues: Paddin
 
         }
 
-        BackHandler {
-            navigationState.navigateBack()  // Handle back press
-        }
 
-        // Start scanning when the screen is composed
-        LaunchedEffect(Unit) {
-            viewModel.scanDevices()
-        }
-
-        val devicesNative by viewModel.devicesNative.collectAsState()
-        val connectionState by viewModel.connectionState.collectAsState()
 
         LaunchedEffect(connectionState){
             println("Screen Device got connected")
@@ -165,17 +176,6 @@ fun BleScanningScreen(navigationState: NavigationNewState, paddingValues: Paddin
         }
 
 
-        Text(
-            text = when (connectionState) {
-                BleConnectionStatus.IDLE -> "Idle"
-                BleConnectionStatus.SCANNING -> "Scanning"
-                BleConnectionStatus.BONDING -> "Bonding..."
-                BleConnectionStatus.CONNECTING -> "Connecting..."
-                BleConnectionStatus.CONNECTED -> "Connected"
-                BleConnectionStatus.DISCONNECTED -> "Disconnected"
-                else -> "Unknown State"
-            }
-        )
 
         Spacer(modifier = Modifier.height(16.dp))
 

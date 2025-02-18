@@ -141,12 +141,6 @@ fun BeaconScreen(db: AppDatabase, navigationState: NavigationNewState, paddingVa
             viewModel.scanBeaconDevices()
         }
 
-      //  val beaconDevice by viewModel.devicesNative.collectAsState()
-
-
-        val beaconDao = db.getBeaconDao()
-
-
 
         val beaconDevice = remember {
             listOf(

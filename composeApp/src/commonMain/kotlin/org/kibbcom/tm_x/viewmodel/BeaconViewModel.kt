@@ -14,8 +14,8 @@ import org.kibbcom.tm_x.models.BeaconDevice
 class BeaconViewModel(private val db: AppDatabase) : ViewModel() {
     private val bleManager = BleManager()
 
-    private val _beaconDevices = MutableStateFlow<List<BeaconDevice>>(emptyList())
-    val devicesNative: StateFlow<List<BeaconDevice>> = _beaconDevices.asStateFlow()
+    private val _nearbyBeaconDevices = MutableStateFlow<List<BeaconDevice>>(emptyList())
+    val nearbyBeaconDevices: StateFlow<List<BeaconDevice>> = _nearbyBeaconDevices.asStateFlow()
 
     private val _savedBeacons = MutableStateFlow<List<BeaconDevice>>(emptyList())
     val savedBeacons: StateFlow<List<BeaconDevice>> = _savedBeacons.asStateFlow()
@@ -23,7 +23,7 @@ class BeaconViewModel(private val db: AppDatabase) : ViewModel() {
     init {
         viewModelScope.launch {
             bleManager.beaconScanResults.collectLatest { scannedDevices ->
-                _beaconDevices.value = scannedDevices
+                _nearbyBeaconDevices.value = scannedDevices
             }
         }
 
