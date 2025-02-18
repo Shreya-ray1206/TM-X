@@ -2,7 +2,7 @@ package org.kibbcom.tm_x.platform
 
 actual class PlatformUtils {
     actual fun isBluetoothEnabled(): Boolean {
-        TODO("Not yet implemented")
+      return true
     }
 
     actual fun isLocationEnabled(): Boolean {
@@ -10,5 +10,8 @@ actual class PlatformUtils {
     }
     actual fun isAndroid(): Boolean = false
 
-    actual fun getAndroidVersion(): Int = 0 // Not applicable for iOS
+    actual fun getAndroidVersion(): Int = 0
+    actual fun getAppVersion(): String {
+        return "0"
+    }
 }

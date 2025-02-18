@@ -5,7 +5,7 @@ import android.content.Context
 import android.location.LocationManager
 import android.os.Build
 import org.kibbcom.tm_x.AppContextProvider
-
+import android.content.pm.PackageManager
 actual class PlatformUtils {
 
     private val context : Context by lazy {
@@ -26,4 +26,15 @@ actual class PlatformUtils {
     actual fun isAndroid(): Boolean = true
 
     actual fun getAndroidVersion(): Int = Build.VERSION.SDK_INT
+
+
+    actual fun getAppVersion(): String {
+            return try {
+                val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+                packageInfo.versionName ?: "Unknown"
+            } catch (e: PackageManager.NameNotFoundException) {
+                "Unknown"
+            }
+    }
+
 }

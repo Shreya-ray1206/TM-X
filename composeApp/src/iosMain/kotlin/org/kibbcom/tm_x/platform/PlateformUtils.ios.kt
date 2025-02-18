@@ -2,6 +2,7 @@ package org.kibbcom.tm_x.platform
 
 import platform.CoreBluetooth.CBCentralManager
 import platform.CoreBluetooth.CBCentralManagerStatePoweredOn
+import platform.Foundation.NSBundle
 import platform.darwin.NSObject
 
 actual class PlatformUtils : NSObject() {
@@ -17,5 +18,10 @@ actual class PlatformUtils : NSObject() {
     actual fun isAndroid(): Boolean = false
 
     actual fun getAndroidVersion(): Int = 0 // Not applicable for iOS
+    actual fun getAppVersion(): String {
+        return NSBundle.mainBundle.infoDictionary?.get("CFBundleShortVersionString") as? String ?: "Unknown"
+
+        return "0"
+    }
 
 }

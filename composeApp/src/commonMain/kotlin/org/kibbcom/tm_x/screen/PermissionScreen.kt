@@ -44,12 +44,10 @@ import org.kibbcom.tm_x.NavigationNewState
 import org.kibbcom.tm_x.Screen
 import org.kibbcom.tm_x.platform.PlatformUtils
 import org.kibbcom.tm_x.theme.getToolbarAdditionColor
-import org.kibbcom.tm_x.theme.primaryWhite
 import org.kibbcom.tm_x.viewmodel.PermissionsViewModel
 import tm_x.composeapp.generated.resources.Res
 import tm_x.composeapp.generated.resources.all_granted
 import tm_x.composeapp.generated.resources.beacon
-import tm_x.composeapp.generated.resources.ble_devices
 import tm_x.composeapp.generated.resources.bluetooth
 import tm_x.composeapp.generated.resources.last_connected
 import tm_x.composeapp.generated.resources.permission_messages
@@ -81,7 +79,7 @@ fun PermissionScreen(navigationState: NavigationNewState, paddingValues: Padding
     val version = platformUtils.getAndroidVersion()
     val isAndroid = platformUtils.isAndroid()
 
-    PermissionUI(viewModel, isAndroid, version, controller, paddingValues,navigationState)
+    PermissionUI(viewModel, isAndroid, version, controller, paddingValues,navigationState,platformUtils)
 
 
     /*
@@ -232,10 +230,11 @@ fun PermissionUI(
     version: Int,
     controller: PermissionsController,
     paddingValues: PaddingValues,
-    navigationState: NavigationNewState
+    navigationState: NavigationNewState,
+    platformUtils: PlatformUtils
 
 ) {
-    val appVersion = "1.0.0"
+    val appVersion = platformUtils.getAppVersion()
     Column(
         modifier = Modifier.fillMaxSize().padding(paddingValues),
         verticalArrangement = Arrangement.Top,
