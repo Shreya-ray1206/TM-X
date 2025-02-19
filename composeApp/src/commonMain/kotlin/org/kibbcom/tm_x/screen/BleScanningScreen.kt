@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -110,15 +111,7 @@ fun BleScanningScreen(appDatabase: AppDatabase,navigationState: NavigationNewSta
         // Create the "Scanning" text with ellipsis
         val scanningText = "Scanning${".".repeat(dotCount.value)}"
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(80.dp)
-                .shadow(
-                    elevation = 8.dp,
-                    shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
-                    ambientColor = Color.White,
-                    spotColor = Color.White
-                )
+            modifier = getCommonModifierForAdditionToolbar(80.dp)
                 .clip(RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp))
                 .background(getToolbarAdditionColor())
         ) {
@@ -152,12 +145,14 @@ fun BleScanningScreen(appDatabase: AppDatabase,navigationState: NavigationNewSta
                         },
                         fontSize = 16.sp,
                         style = MaterialTheme.typography.titleSmall,
+                        color = Color.White
                     )
                 }
 
             }
 
         }
+
         //todo ios crashing here
 
 /*
@@ -202,18 +197,17 @@ fun BleScanningScreen(appDatabase: AppDatabase,navigationState: NavigationNewSta
 @Composable
 fun DeviceItem(device: BleDeviceCommon, navigationState: NavigationNewState,viewModel: ScanningViewModel) {
 
+    val cardColor = if (!isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.surfaceVariant // This will now use the theme value
+
+
     Card(
         modifier = Modifier.padding(10.dp).clickable {
 
-            navigationState.navigateTo(Screen.DeviceDetailScreen)
-//                        //todo for scanning
-//                        viewModel.stopScanningDevice()
-//                        viewModel.bondWithDevice(device.id)
         },
         shape = RoundedCornerShape(8.dp), // Keep all corners rounded at 25.dp
         elevation = CardDefaults.cardElevation(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant // This will now use the theme value
+            containerColor =cardColor // This will now use the theme value
         )
     ){
         Row(
@@ -294,8 +288,8 @@ fun DeviceItem(device: BleDeviceCommon, navigationState: NavigationNewState,view
                         modifier = Modifier.wrapContentWidth()
                     ) {
                         Text(
-                            text = if (false) "Connected" else "Connect",
-                            color = if (false) Color(0xFF88D66C) else Color.White
+                            text = "Connect",
+                            color = Color.White
                         )
                     }
                 }

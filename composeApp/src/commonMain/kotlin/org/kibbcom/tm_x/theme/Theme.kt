@@ -35,7 +35,7 @@ fun TmxAppTheme(
 
     // Set Status Bar color for Android
     setStatusBarColor(
-        color = if (darkTheme) darkPrimaryGrey else lightDarkBlue,
+        color = if (darkTheme) darkPrimaryGrey else lightPrimaryBlue,
         isDarkIcons = !darkTheme
     )
 

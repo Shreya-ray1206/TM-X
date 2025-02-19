@@ -1,5 +1,9 @@
 package org.kibbcom.tm_x.screen
 
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -10,7 +14,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.kibbcom.tm_x.NavigationNewState
 import org.kibbcom.tm_x.Screen
@@ -77,3 +85,18 @@ fun BackTopBar(navigationState: NavigationNewState,title: String) {
         )
     )
 }
+
+
+@Composable
+fun getCommonModifierForAdditionToolbar(height: Dp): Modifier {
+    return  Modifier
+        .fillMaxWidth()
+        .height(height)
+        .shadow(
+            elevation = 8.dp,
+            shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
+            ambientColor = if(isSystemInDarkTheme()) Color.Gray else Color.Magenta,
+            spotColor =  if(isSystemInDarkTheme()) Color.Gray else Color.Magenta
+        )
+}
+

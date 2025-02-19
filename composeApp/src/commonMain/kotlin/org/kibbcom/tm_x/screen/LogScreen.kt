@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import org.kibbcom.tm_x.platform.BackHandler
 
 @Composable
 fun LogScreen(navigationState: NavigationNewState, paddingValues: PaddingValues) {
@@ -34,6 +35,10 @@ fun LogScreen(navigationState: NavigationNewState, paddingValues: PaddingValues)
         modifier = Modifier
             .fillMaxSize().padding(paddingValues)
     ) {
+        BackHandler {
+            navigationState.navigateBack()  // Handle back press
+        }
+
         // Top Section: RecyclerView and TextView
         LogListSection()
 

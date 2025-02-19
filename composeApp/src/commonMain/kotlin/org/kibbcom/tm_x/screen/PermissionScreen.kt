@@ -3,6 +3,7 @@ package org.kibbcom.tm_x.screen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,7 +44,6 @@ import dev.icerock.moko.permissions.PermissionState
 import dev.icerock.moko.permissions.PermissionsController
 import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
-import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -50,7 +51,6 @@ import org.kibbcom.tm_x.NavigationNewState
 import org.kibbcom.tm_x.Screen
 import org.kibbcom.tm_x.ble.BleConnectionStatus
 import org.kibbcom.tm_x.db.AppDatabase
-import org.kibbcom.tm_x.models.BleDeviceCommon
 import org.kibbcom.tm_x.platform.PlatformUtils
 import org.kibbcom.tm_x.platform.ScanningViewModelFactory
 import org.kibbcom.tm_x.theme.getToolbarAdditionColor
@@ -95,95 +95,6 @@ fun PermissionScreen(appDatabase: AppDatabase,navigationState: NavigationNewStat
     PermissionUI(viewModel, isAndroid, version, controller, paddingValues,navigationState,platformUtils,scanningViewModel)
 
 
-    /*
-
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(modifier = Modifier.height(50.dp))
-
-            val version = platformUtils.getAndroidVersion()
-            val isAndroid = platformUtils.isAndroid()
-            if (isAndroid){
-
-                when {
-
-
-                    // ✅ If BLE permissions are granted & Bluetooth is ON
-                    (viewModel.bleScanPermissionState == PermissionState.Granted &&
-                            viewModel.bleConnectPermissionState == PermissionState.Granted &&
-                            viewModel.isBluetoothEnabled) -> {
-                        Text("BLE permissions granted!")
-                        Spacer(modifier = Modifier.height(50.dp))
-                        Button(onClick = {
-                            navigationState.navigateTo(Screen.BleScanning) // Navigate to next screen
-                        }) {
-                            Text(stringResource(Res.string.scan_devices))
-                        }
-                    }
-
-                    // ✅ If on Android <12, also check Location permission & status
-                    (isAndroid && version < 31 &&
-                            viewModel.bleScanPermissionState == PermissionState.Granted &&
-                            viewModel.locationPermissionState == PermissionState.Granted &&
-                            viewModel.isBluetoothEnabled &&
-                            viewModel.isLocationEnabled) -> {
-                        Text("All required permissions granted!")
-                        Spacer(modifier = Modifier.height(50.dp))
-                        Button(onClick = {
-                            navigationState.navigateTo(Screen.BleScanning)
-                        }) {
-                            Text(stringResource(Res.string.scan_devices))
-                        }
-                    }
-
-                    // ❌ If any permission is permanently denied
-                    (viewModel.bleScanPermissionState == PermissionState.DeniedAlways ||
-                            viewModel.bleConnectPermissionState == PermissionState.DeniedAlways ||
-                            viewModel.locationPermissionState == PermissionState.DeniedAlways) -> {
-                        Text("One or more permissions were permanently denied.")
-                        Spacer(modifier = Modifier.height(50.dp))
-
-                        Button(onClick = {
-                            controller.openAppSettings() // Open settings to enable manually
-                        }) {
-                            Text("Open app settings")
-                        }
-                    }
-
-                    // ❌ If Bluetooth is OFF
-                    !viewModel.isBluetoothEnabled -> {
-                        Text("Please turn on Bluetooth.")
-                    }
-
-                    // ❌ If on Android <12 and Location is OFF
-                    (isAndroid && version < 31 && !viewModel.isLocationEnabled) -> {
-                        Text("Please turn on Location for BLE scanning.")
-                    }
-
-                    // ❌ If permissions are not yet granted
-                    else -> {
-                        Text("Permissions are required for BLE scanning.")
-                        Spacer(modifier = Modifier.height(50.dp))
-                        Button(onClick = { viewModel.provideOrRequestPermissions() }) {
-                            Text("Request BLE permissions")
-                        }
-                    }
-                }
-            }else{
-                Text("BLE permissions granted!")
-                Spacer(modifier = Modifier.height(50.dp))
-                Button(onClick = {
-                    navigationState.navigateTo(Screen.BleScanning) // Navigate to next screen
-                }) {
-                    Text(stringResource(Res.string.scan_devices))
-                }
-            }
-
-        }
-    */
 
 
     /*
@@ -258,15 +169,7 @@ fun PermissionUI(
         val connectionState by scanningViewModel.connectionState.collectAsState()
         // Top Box with Rounded Bottom Corners
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp)
-                .shadow(
-                    elevation = 8.dp,
-                    shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
-                    ambientColor = Color.White,
-                    spotColor = Color.White
-                )
+                 modifier = getCommonModifierForAdditionToolbar(100.dp)
                 .clip(RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp))
                 .background(getToolbarAdditionColor()) // Change to darkPrimaryGrey if needed
         ) {
@@ -353,19 +256,26 @@ fun PermissionUI(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            val ble_scan = Color(0xFFafcaff)
+            /*val ble_scan = Color(0xFFafcaff)
             val beacon_scan = Color(0xFFdaf0fb)
-            val last_connected = Color(0xFFf9fee0)
+            val last_connected = Color(0xFFf9fee0)*/
+
+            val ble_scan = Color(0xFFafcaff)
+            val all_saved_beacon = Color(0xFFfef4e0)
+            val beacon_scan = Color(0xFFdaf0fb)
+            val last_connected = Color(0xFFf4fdc7)
+
+
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                CardItem(stringResource(Res.string.scan_ble), resource = Res.drawable.bluetooth, moreText = "Scan nearby ble devices", modifier = Modifier.weight(1f), color = ble_scan) {
+                CardItem(stringResource(Res.string.scan_ble), resource = Res.drawable.bluetooth, moreText = "Scan nearby ble devices", modifier = Modifier.weight(1f), colorForIcon = ble_scan) {
                     navigationState.navigateTo(Screen.BleScanning)
                 }
 
-                CardItem(stringResource(Res.string.scan_beacon), resource = Res.drawable.beacon, moreText = "Scan nearby beacons", modifier = Modifier.weight(1f), color = beacon_scan) {
+                CardItem(stringResource(Res.string.scan_beacon), resource = Res.drawable.beacon, moreText = "Scan nearby beacons", modifier = Modifier.weight(1f), colorForIcon = beacon_scan) {
                     navigationState.navigateTo(Screen.Beacon)
                 }
             }
@@ -374,7 +284,7 @@ fun PermissionUI(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                CardItem(stringResource(Res.string.saved_beacon), resource = Res.drawable.beacon, moreText = "All the saved beacons.", modifier = Modifier.weight(1f), color = beacon_scan) {
+                CardItem(stringResource(Res.string.saved_beacon), resource = Res.drawable.beacon, moreText = "All the saved beacons.", modifier = Modifier.weight(1f), colorForIcon = all_saved_beacon) {
                     navigationState.navigateTo(Screen.SavedBeacon)
                 }
 
@@ -394,12 +304,10 @@ fun PermissionUI(
 
                         cardTitle = "Connected"
 
-                        delay(2000)
-                        navigationState.navigateTo(Screen.DeviceDetailScreen)
                     }
                 }
 
-                CardItem(cardTitle, resource = Res.drawable.bluetooth, moreText = moreText, modifier = Modifier.weight(1f), color = last_connected) {
+                CardItem(cardTitle, resource = Res.drawable.bluetooth, moreText = moreText, modifier = Modifier.weight(1f), colorForIcon = last_connected) {
                     lastConnectedDevice?.let { it1 -> scanningViewModel.bondWithDevice(it1) }
                 }
 
@@ -408,45 +316,45 @@ fun PermissionUI(
         }
 
 
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .align(Alignment.BottomCenter) // Apply alignment here inside Box
+                    .align(Alignment.BottomCenter)
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(2.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(
-                    text = stringResource(Res.string.user_manual),
-                   style = MaterialTheme.typography.headlineSmall.copy(
-                        textDecoration = TextDecoration.Underline
-                    ),
-                    modifier = Modifier.clickable { println("User Manual clicked!") }
-                )
+                Divider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp, color = Color.Gray.copy(alpha = 0.3f))
 
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Text(
+                        text = stringResource(Res.string.user_manual),
+                        style = MaterialTheme.typography.bodyLarge.copy(textDecoration = TextDecoration.Underline),
+                        modifier = Modifier.clickable { println("User Manual clicked!") }
+                    )
+
+                    Text(
+                        text = "TM-X Info",
+                        style = MaterialTheme.typography.bodyLarge.copy(textDecoration = TextDecoration.Underline),
+                        modifier = Modifier.clickable { println("Team Info clicked!") }
+                    )
+                }
+
+                val versionTitle = stringResource(Res.string.version_info)
                 Text(
-                    text = "TM-X Info",
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        textDecoration = TextDecoration.Underline
-                    ),
-                    modifier = Modifier.clickable { println("Team Info clicked!") }
-                )
-                Spacer(Modifier.height(2.dp))
-                val versionTitle  = stringResource(Res.string.version_info)
-                Text(
-                    text = "$versionTitle :-$appVersion",
+                    text = "$versionTitle: $appVersion",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Spacer(Modifier.height(5.dp))
 
                 Text(
                     text = "Copyright ©2025 Kibbcom India Pvt Ltd.",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -460,17 +368,24 @@ fun CardItem(title: String,
              moreText : String? = null,
              resource: DrawableResource,
              modifier: Modifier,
-             color: Color,onClick: () -> Unit) {
+             colorForIcon: Color, onClick: () -> Unit) {
+
+    val cardColor = if (!isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.surfaceVariant // This will now use the theme value
+
+
+
     Card(
         modifier = modifier.height(120.dp) .clickable { onClick() },
         shape = RoundedCornerShape(8.dp), // Keep all corners rounded at 25.dp
-        elevation = CardDefaults.cardElevation(8.dp)
+        elevation = CardDefaults.cardElevation(8.dp),
+        colors = CardDefaults.cardColors(containerColor = cardColor)
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             // Title in Center
+            val darkerTextColor = colorForIcon.copy(red = colorForIcon.red * 0.9f, green = colorForIcon.green * 0.9f, blue = colorForIcon.blue * 0.9f)
 
             Column(
                 modifier = Modifier
@@ -490,7 +405,7 @@ fun CardItem(title: String,
                 // Title at the bottom-left
                 Text(
                     text = title,
-                    color = color
+                    color = darkerTextColor //Color(0xFF7a8db2)
                 )
             }
 
@@ -501,7 +416,7 @@ fun CardItem(title: String,
                     .size(60.dp) // Size of the circle
                     .offset(x = 10.dp, y = -10.dp) // Position it slightly outside the card
                     .clip(CircleShape) // Keep the white overlay circular
-                    .background(color)
+                    .background(colorForIcon)
                     .align(Alignment.TopEnd), // Position at top-right
                 contentAlignment = Alignment.Center
             ) {

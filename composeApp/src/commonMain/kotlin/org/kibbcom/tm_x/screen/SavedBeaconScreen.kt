@@ -61,15 +61,7 @@ fun SavedBeaconScreen(db: AppDatabase, navigationState: NavigationNewState, padd
     ) {
 
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(80.dp)
-                .shadow(
-                    elevation = 8.dp,
-                    shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
-                    ambientColor = Color.White,
-                    spotColor = Color.White
-                )
+            modifier = getCommonModifierForAdditionToolbar(80.dp)
                 .clip(RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp))
                 .background(getToolbarAdditionColor())
         ) {
@@ -94,6 +86,7 @@ fun SavedBeaconScreen(db: AppDatabase, navigationState: NavigationNewState, padd
                         text = "This data is stored on your device. If you no longer need it, you can remove it.",
                         fontSize = 16.sp,
                         style = MaterialTheme.typography.titleSmall,
+                        color = Color.White
                     )
                 }
 
@@ -109,7 +102,7 @@ fun SavedBeaconScreen(db: AppDatabase, navigationState: NavigationNewState, padd
 
 
         val savedBeacons by viewModel.savedBeacons.collectAsState()
-
+        Spacer(modifier = Modifier.height(16.dp))
         LazyColumn {
             items(savedBeacons) { device ->
 

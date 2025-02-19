@@ -5,6 +5,6 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class BleDeviceCommon(
-    @PrimaryKey val id: String,  // Ensure only one entry exists
+    @PrimaryKey val id: String,
     val name : String?
 )

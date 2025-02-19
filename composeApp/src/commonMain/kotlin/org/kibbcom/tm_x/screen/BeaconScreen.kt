@@ -90,15 +90,7 @@ fun BeaconScreen(db: AppDatabase, navigationState: NavigationNewState, paddingVa
         // Create the "Scanning" text with ellipsis
         val scanningText = "Scanning${".".repeat(dotCount.value)}"
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(80.dp)
-                .shadow(
-                    elevation = 8.dp,
-                    shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
-                    ambientColor = Color.White,
-                    spotColor = Color.White
-                )
+            modifier = getCommonModifierForAdditionToolbar(80.dp)
                 .clip(RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp))
                 .background(getToolbarAdditionColor())
         ) {
@@ -124,6 +116,7 @@ fun BeaconScreen(db: AppDatabase, navigationState: NavigationNewState, paddingVa
                         text = scanningText,
                         fontSize = 16.sp,
                         style = MaterialTheme.typography.titleSmall,
+                        color = Color.White
                     )
                 }
 
@@ -153,7 +146,7 @@ fun BeaconScreen(db: AppDatabase, navigationState: NavigationNewState, paddingVa
             )
         }
 
-
+        Spacer(modifier = Modifier.height(16.dp))
 
         LazyColumn {
             items(beaconDevice) { device ->
