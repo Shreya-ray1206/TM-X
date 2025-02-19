@@ -3,10 +3,12 @@ package org.kibbcom.tm_x.db
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import org.kibbcom.tm_x.models.BeaconDevice
+import org.kibbcom.tm_x.models.BleDeviceCommon
 
-@Database(entities = [BeaconDevice::class], version =  1)
+@Database(entities = [BeaconDevice::class, BleDeviceCommon::class], version =  1)
 abstract class AppDatabase: RoomDatabase(), DB {
     abstract fun getBeaconDao(): BeaconDao
+    abstract fun getBleDao(): BleDao
 
     override fun clearAllTables() {
         super.clearAllTables()

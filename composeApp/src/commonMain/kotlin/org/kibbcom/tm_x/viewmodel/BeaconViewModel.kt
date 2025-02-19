@@ -20,7 +20,10 @@ class BeaconViewModel(private val db: AppDatabase) : ViewModel() {
     private val _savedBeacons = MutableStateFlow<List<BeaconDevice>>(emptyList())
     val savedBeacons: StateFlow<List<BeaconDevice>> = _savedBeacons.asStateFlow()
 
-    init {
+
+  //todo ios crashing here
+
+  /*  init {
         viewModelScope.launch {
             bleManager.beaconScanResults.collectLatest { scannedDevices ->
                 _nearbyBeaconDevices.value = scannedDevices
@@ -31,7 +34,8 @@ class BeaconViewModel(private val db: AppDatabase) : ViewModel() {
         viewModelScope.launch {
             _savedBeacons.value = db.getBeaconDao().getAll()
         }
-    }
+    }*/
+
 
     fun scanBeaconDevices() {
         bleManager.scanBeaconDevices()

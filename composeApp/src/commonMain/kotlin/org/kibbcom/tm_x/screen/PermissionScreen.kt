@@ -23,6 +23,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,9 +44,13 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.kibbcom.tm_x.NavigationNewState
 import org.kibbcom.tm_x.Screen
+import org.kibbcom.tm_x.db.AppDatabase
+import org.kibbcom.tm_x.models.BleDeviceCommon
 import org.kibbcom.tm_x.platform.PlatformUtils
+import org.kibbcom.tm_x.platform.ScanningViewModelFactory
 import org.kibbcom.tm_x.theme.getToolbarAdditionColor
 import org.kibbcom.tm_x.viewmodel.PermissionsViewModel
+import org.kibbcom.tm_x.viewmodel.ScanningViewModel
 import tm_x.composeapp.generated.resources.Res
 import tm_x.composeapp.generated.resources.all_granted
 import tm_x.composeapp.generated.resources.beacon
@@ -63,7 +69,7 @@ import tm_x.composeapp.generated.resources.version_info
 
 
 @Composable
-fun PermissionScreen(navigationState: NavigationNewState, paddingValues: PaddingValues) {
+fun PermissionScreen(appDatabase: AppDatabase,navigationState: NavigationNewState, paddingValues: PaddingValues,scanningViewModel: ScanningViewModel = viewModel(factory = ScanningViewModelFactory(db = appDatabase))) {
     val factory = rememberPermissionsControllerFactory()
     val controller = remember(factory) {
         factory.createPermissionsController()
@@ -79,7 +85,9 @@ fun PermissionScreen(navigationState: NavigationNewState, paddingValues: Padding
     val version = platformUtils.getAndroidVersion()
     val isAndroid = platformUtils.isAndroid()
 
-    PermissionUI(viewModel, isAndroid, version, controller, paddingValues,navigationState,platformUtils)
+
+
+    PermissionUI(viewModel, isAndroid, version, controller, paddingValues,navigationState,platformUtils,scanningViewModel)
 
 
     /*
@@ -231,7 +239,8 @@ fun PermissionUI(
     controller: PermissionsController,
     paddingValues: PaddingValues,
     navigationState: NavigationNewState,
-    platformUtils: PlatformUtils
+    platformUtils: PlatformUtils,
+    scanningViewModel: ScanningViewModel
 
 ) {
     val appVersion = platformUtils.getAppVersion()
@@ -240,8 +249,7 @@ fun PermissionUI(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-
+        val lastConnectedDevice by scanningViewModel.lastConnectedDevice.collectAsState()
         // Top Box with Rounded Bottom Corners
         Column(
             modifier = Modifier
@@ -364,8 +372,16 @@ fun PermissionUI(
                     navigationState.navigateTo(Screen.SavedBeacon)
                 }
 
-                CardItem(stringResource(Res.string.last_connected), resource = Res.drawable.bluetooth, moreText = "Ctek Njord 1.2.6", modifier = Modifier.weight(1f), color = last_connected) {
+                var moreText = "N/A"
+
+                if (lastConnectedDevice != null) {
+
+                    moreText = lastConnectedDevice?.name.toString()
+                }
+
+                CardItem(stringResource(Res.string.last_connected), resource = Res.drawable.bluetooth, moreText = moreText, modifier = Modifier.weight(1f), color = last_connected) {
                     println("Last Connected clicked!")
+
                 }
 
 

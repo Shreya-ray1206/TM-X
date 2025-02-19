@@ -369,6 +369,7 @@ actual class BleManager actual constructor() {
 
     @SuppressLint("MissingPermission")
     actual fun bondWithDevice(deviceId: String) {
+        println("Bond with device method called ")
         val device = bluetoothAdapter?.getRemoteDevice(deviceId)
         if (device == null) {
             println("Device not found: $deviceId")

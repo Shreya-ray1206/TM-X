@@ -32,7 +32,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,7 +49,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.kibbcom.tm_x.NavigationNewState
 import org.kibbcom.tm_x.models.BeaconDevice
 import org.kibbcom.tm_x.platform.BackHandler
-import org.kibbcom.tm_x.platform.viewmodel.BeaconViewModelFactory
+import org.kibbcom.tm_x.platform.viewmoel_factory.BeaconViewModelFactory
 import org.kibbcom.tm_x.theme.getToolbarAdditionColor
 import org.kibbcom.tm_x.viewmodel.BeaconViewModel
 import tm_x.composeapp.generated.resources.Res

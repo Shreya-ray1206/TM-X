@@ -1,6 +1,10 @@
 package org.kibbcom.tm_x.models
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity
 data class BleDeviceCommon(
-    val id : String, // MAC address (Android) / UUID (iOS)
+    @PrimaryKey val id: String,  // Ensure only one entry exists
     val name : String?
 )

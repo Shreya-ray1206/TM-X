@@ -46,11 +46,11 @@ fun App(db: AppDatabase, navigationState: NavigationNewState = remember { Naviga
             }
         ) { paddingValues ->  // Capture padding from Scaffold
             when (navigationState.currentScreen) {
-                is Screen.BleScanning -> BleScanningScreen(navigationState, paddingValues)
+                is Screen.BleScanning -> BleScanningScreen(db,navigationState, paddingValues)
                 is Screen.Beacon -> BeaconScreen(db,navigationState, paddingValues)
                 is Screen.Settings -> SettingsScreen(navigationState, paddingValues)
                 is Screen.LogScreen -> LogScreen(navigationState, paddingValues)
-                is Screen.Permission -> PermissionScreen(navigationState,paddingValues)
+                is Screen.Permission -> PermissionScreen(db,navigationState,paddingValues)
                 is Screen.SavedBeacon -> SavedBeaconScreen(db,navigationState,paddingValues)
                 is Screen.DeviceDetailScreen -> DeviceDetailScreen(navigationState,paddingValues)
                 else -> {}

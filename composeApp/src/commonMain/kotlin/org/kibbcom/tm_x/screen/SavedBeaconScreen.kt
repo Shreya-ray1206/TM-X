@@ -42,7 +42,7 @@ import org.kibbcom.tm_x.NavigationNewState
 import org.kibbcom.tm_x.db.AppDatabase
 import org.kibbcom.tm_x.models.BeaconDevice
 import org.kibbcom.tm_x.platform.BackHandler
-import org.kibbcom.tm_x.platform.viewmodel.BeaconViewModelFactory
+import org.kibbcom.tm_x.platform.viewmoel_factory.BeaconViewModelFactory
 import org.kibbcom.tm_x.theme.getToolbarAdditionColor
 import org.kibbcom.tm_x.viewmodel.BeaconViewModel
 import tm_x.composeapp.generated.resources.Res

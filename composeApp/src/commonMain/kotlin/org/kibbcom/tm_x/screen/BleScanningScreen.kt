@@ -52,6 +52,7 @@ import org.kibbcom.tm_x.NavigationNewState
 import org.kibbcom.tm_x.platform.ScanningViewModelFactory
 import org.kibbcom.tm_x.Screen
 import org.kibbcom.tm_x.ble.BleConnectionStatus
+import org.kibbcom.tm_x.db.AppDatabase
 import org.kibbcom.tm_x.models.BleDeviceCommon
 import org.kibbcom.tm_x.platform.BackHandler
 import org.kibbcom.tm_x.theme.CardBorderColor
@@ -63,7 +64,9 @@ import tm_x.composeapp.generated.resources.bluetooth
 
 
 @Composable
-fun BleScanningScreen(navigationState: NavigationNewState, paddingValues: PaddingValues, viewModel: ScanningViewModel = viewModel(factory = ScanningViewModelFactory())) {
+fun BleScanningScreen(appDatabase: AppDatabase,navigationState: NavigationNewState, paddingValues: PaddingValues,
+                      viewModel: ScanningViewModel = viewModel(factory = ScanningViewModelFactory(db = appDatabase))
+) {
     Column(
         modifier = Modifier
             .fillMaxSize() .padding(paddingValues)
@@ -83,7 +86,11 @@ fun BleScanningScreen(navigationState: NavigationNewState, paddingValues: Paddin
         val devicesNative by viewModel.devicesNative.collectAsState()
         val connectionState by viewModel.connectionState.collectAsState()
 
-
+        LaunchedEffect(connectionState){
+            if (connectionState== BleConnectionStatus.CONNECTED){
+                navigationState.navigateTo(Screen.DeviceDetailScreen)
+            }
+        }
 
         // Top Box with Rounded Bottom Corners
         var dotCount = remember { mutableStateOf(1) }
@@ -182,7 +189,7 @@ fun BleScanningScreen(navigationState: NavigationNewState, paddingValues: Paddin
         LazyColumn {
             items(devicesNative) { device ->
 
-                DeviceItem(device,navigationState)
+                DeviceItem(device,navigationState,viewModel)
 
             }
         }
@@ -193,7 +200,7 @@ fun BleScanningScreen(navigationState: NavigationNewState, paddingValues: Paddin
 
 
 @Composable
-fun DeviceItem(device: BleDeviceCommon, navigationState: NavigationNewState) {
+fun DeviceItem(device: BleDeviceCommon, navigationState: NavigationNewState,viewModel: ScanningViewModel) {
 
     Card(
         modifier = Modifier.padding(10.dp).clickable {
@@ -275,8 +282,11 @@ fun DeviceItem(device: BleDeviceCommon, navigationState: NavigationNewState) {
 
                     // Connect Button
                     Button(
-                        onClick = { /* Handle connect */ },
-                        enabled = false,
+                        onClick = {
+                            viewModel.stopScanningDevice()
+                            viewModel.bondWithDevice(device)
+                        },
+                        enabled = true,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.secondary, // Blue button in M3
                             contentColor = Color.White // White text
