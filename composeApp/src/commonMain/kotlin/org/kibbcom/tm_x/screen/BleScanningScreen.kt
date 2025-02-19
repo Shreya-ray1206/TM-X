@@ -158,9 +158,9 @@ fun BleScanningScreen(appDatabase: AppDatabase,navigationState: NavigationNewSta
             }
 
         }
+        //todo ios crashing here
 
-
-
+/*
         LaunchedEffect(connectionState){
             println("Screen Device got connected")
 
@@ -180,7 +180,7 @@ fun BleScanningScreen(appDatabase: AppDatabase,navigationState: NavigationNewSta
                 delay(4000)
                 viewModel.writeBleData(serviceUuid,PASSWORD,"vbvm8893".toByteArray())
             }
-        }
+        }*/
 
 
 

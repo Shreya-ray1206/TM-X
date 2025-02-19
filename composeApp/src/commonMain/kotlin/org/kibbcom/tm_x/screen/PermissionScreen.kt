@@ -23,9 +23,12 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,11 +42,13 @@ import dev.icerock.moko.permissions.PermissionState
 import dev.icerock.moko.permissions.PermissionsController
 import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.kibbcom.tm_x.NavigationNewState
 import org.kibbcom.tm_x.Screen
+import org.kibbcom.tm_x.ble.BleConnectionStatus
 import org.kibbcom.tm_x.db.AppDatabase
 import org.kibbcom.tm_x.models.BleDeviceCommon
 import org.kibbcom.tm_x.platform.PlatformUtils
@@ -250,6 +255,7 @@ fun PermissionUI(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val lastConnectedDevice by scanningViewModel.lastConnectedDevice.collectAsState()
+        val connectionState by scanningViewModel.connectionState.collectAsState()
         // Top Box with Rounded Bottom Corners
         Column(
             modifier = Modifier
@@ -373,15 +379,28 @@ fun PermissionUI(
                 }
 
                 var moreText = "N/A"
+                val defaultTitle = stringResource(Res.string.last_connected) // Get the string first
+                var cardTitle by remember { mutableStateOf(defaultTitle) }
+
 
                 if (lastConnectedDevice != null) {
 
                     moreText = lastConnectedDevice?.name.toString()
                 }
 
-                CardItem(stringResource(Res.string.last_connected), resource = Res.drawable.bluetooth, moreText = moreText, modifier = Modifier.weight(1f), color = last_connected) {
-                    println("Last Connected clicked!")
+                LaunchedEffect(connectionState){
+                    if (connectionState == BleConnectionStatus.CONNECTED) {
+                        println("BLE Connection in UI cardtitle")
 
+                        cardTitle = "Connected"
+
+                        delay(2000)
+                        navigationState.navigateTo(Screen.DeviceDetailScreen)
+                    }
+                }
+
+                CardItem(cardTitle, resource = Res.drawable.bluetooth, moreText = moreText, modifier = Modifier.weight(1f), color = last_connected) {
+                    lastConnectedDevice?.let { it1 -> scanningViewModel.bondWithDevice(it1) }
                 }
 
 
