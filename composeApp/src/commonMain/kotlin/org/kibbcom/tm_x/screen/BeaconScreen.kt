@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,10 +48,11 @@ import org.kibbcom.tm_x.db.AppDatabase
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 import org.kibbcom.tm_x.NavigationNewState
+import org.kibbcom.tm_x.common.getCommonCardColor
+import org.kibbcom.tm_x.common.getToolbarAdditionColor
 import org.kibbcom.tm_x.models.BeaconDevice
 import org.kibbcom.tm_x.platform.BackHandler
 import org.kibbcom.tm_x.platform.viewmoel_factory.BeaconViewModelFactory
-import org.kibbcom.tm_x.theme.getToolbarAdditionColor
 import org.kibbcom.tm_x.viewmodel.BeaconViewModel
 import tm_x.composeapp.generated.resources.Res
 import tm_x.composeapp.generated.resources.beacon
@@ -167,13 +169,12 @@ fun BeaconItem(beacon: BeaconDevice, viewModel: BeaconViewModel) {
 
     val isDbSaved = savedBeacons.any { it.macAddress == beacon.macAddress } // Check if beacon is saved
 
-
     Card(
         modifier = Modifier.padding(10.dp),
         shape = RoundedCornerShape(8.dp), // Keep all corners rounded at 25.dp
         elevation = CardDefaults.cardElevation(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant // This will now use the theme value
+            containerColor = getCommonCardColor()
         )
     ){
         Column(

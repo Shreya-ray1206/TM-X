@@ -46,11 +46,6 @@ fun TmxAppTheme(
     )
 }
 
-@Composable
-fun getToolbarAdditionColor(): Color {
-    val darkTheme: Boolean = isSystemInDarkTheme()
 
-    return if (darkTheme) darkPrimaryGrey else lightPrimaryBlue
-}
 
 

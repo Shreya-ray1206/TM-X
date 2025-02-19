@@ -2,17 +2,45 @@ package org.kibbcom.tm_x.platform
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import kotlinx.cinterop.ExperimentalForeignApi
+import platform.Foundation.NSSelectorFromString
+import platform.Foundation.performSelectorOnMainThread
 import platform.UIKit.UIApplication
-import platform.UIKit.UIColor
+import platform.UIKit.UIStatusBarStyleDarkContent
 import platform.UIKit.UIStatusBarStyleLightContent
-import platform.UIKit.UIUserInterfaceStyle
-import platform.UIKit.UIWindowScene
+import platform.UIKit.UIViewController
+import platform.UIKit.setStatusBarStyle
 
+@OptIn(ExperimentalForeignApi::class)
 @Composable
 actual fun setStatusBarColor(
     color: Color,
     isDarkIcons: Boolean
 ) {
+    val viewController = getRootViewController()
+
+    // Run on the main thread
+    viewController?.performSelectorOnMainThread(
+        NSSelectorFromString("setNeedsStatusBarAppearanceUpdate"),
+        null,
+        false
+    )
+
+    // Change status bar style based on `isDarkIcons`
+    val statusBarStyle = if (isDarkIcons) {
+        UIStatusBarStyleDarkContent // Light background, dark icons (iOS 13+)
+    } else {
+        UIStatusBarStyleLightContent // Dark background, light icons
+    }
+
+    // Apply the new style
+    UIApplication.sharedApplication.setStatusBarStyle(statusBarStyle)
+}
+
+fun getRootViewController(): UIViewController? {
+    return UIApplication.sharedApplication.keyWindow?.rootViewController
+}
+
    /* val uiColor = UIColor(
         red = color.red.toDouble(),
         green = color.green.toDouble(),
@@ -32,4 +60,3 @@ actual fun setStatusBarColor(
     if (Build.VERSION.SDK_INT < 13) {
         UIApplication.sharedApplication.statusBarStyle = statusBarStyle
     }*/
-}

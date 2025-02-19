@@ -2,7 +2,6 @@ package org.kibbcom.tm_x.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -16,8 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -39,28 +36,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.ktor.utils.io.core.toByteArray
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 import org.kibbcom.tm_x.NavigationNewState
-import org.kibbcom.tm_x.platform.ScanningViewModelFactory
 import org.kibbcom.tm_x.Screen
 import org.kibbcom.tm_x.ble.BleConnectionStatus
+import org.kibbcom.tm_x.common.getCommonCardColor
+import org.kibbcom.tm_x.common.getToolbarAdditionColor
 import org.kibbcom.tm_x.db.AppDatabase
 import org.kibbcom.tm_x.models.BleDeviceCommon
 import org.kibbcom.tm_x.platform.BackHandler
-import org.kibbcom.tm_x.theme.CardBorderColor
-import org.kibbcom.tm_x.theme.getToolbarAdditionColor
+import org.kibbcom.tm_x.platform.ScanningViewModelFactory
 import org.kibbcom.tm_x.viewmodel.ScanningViewModel
 import tm_x.composeapp.generated.resources.Res
-import tm_x.composeapp.generated.resources.beacon
 import tm_x.composeapp.generated.resources.bluetooth
 
 
@@ -197,17 +190,15 @@ fun BleScanningScreen(appDatabase: AppDatabase,navigationState: NavigationNewSta
 @Composable
 fun DeviceItem(device: BleDeviceCommon, navigationState: NavigationNewState,viewModel: ScanningViewModel) {
 
-    val cardColor = if (!isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.surfaceVariant // This will now use the theme value
-
 
     Card(
         modifier = Modifier.padding(10.dp).clickable {
 
         },
-        shape = RoundedCornerShape(8.dp), // Keep all corners rounded at 25.dp
+        shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor =cardColor // This will now use the theme value
+            containerColor = getCommonCardColor()
         )
     ){
         Row(

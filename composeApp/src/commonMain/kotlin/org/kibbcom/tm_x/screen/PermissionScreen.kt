@@ -50,10 +50,11 @@ import org.jetbrains.compose.resources.stringResource
 import org.kibbcom.tm_x.NavigationNewState
 import org.kibbcom.tm_x.Screen
 import org.kibbcom.tm_x.ble.BleConnectionStatus
+import org.kibbcom.tm_x.common.getCommonCardColor
+import org.kibbcom.tm_x.common.getToolbarAdditionColor
 import org.kibbcom.tm_x.db.AppDatabase
 import org.kibbcom.tm_x.platform.PlatformUtils
 import org.kibbcom.tm_x.platform.ScanningViewModelFactory
-import org.kibbcom.tm_x.theme.getToolbarAdditionColor
 import org.kibbcom.tm_x.viewmodel.PermissionsViewModel
 import org.kibbcom.tm_x.viewmodel.ScanningViewModel
 import tm_x.composeapp.generated.resources.Res
@@ -370,7 +371,6 @@ fun CardItem(title: String,
              modifier: Modifier,
              colorForIcon: Color, onClick: () -> Unit) {
 
-    val cardColor = if (!isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.surfaceVariant // This will now use the theme value
 
 
 
@@ -378,7 +378,7 @@ fun CardItem(title: String,
         modifier = modifier.height(120.dp) .clickable { onClick() },
         shape = RoundedCornerShape(8.dp), // Keep all corners rounded at 25.dp
         elevation = CardDefaults.cardElevation(8.dp),
-        colors = CardDefaults.cardColors(containerColor = cardColor)
+        colors = CardDefaults.cardColors(containerColor = getCommonCardColor())
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
