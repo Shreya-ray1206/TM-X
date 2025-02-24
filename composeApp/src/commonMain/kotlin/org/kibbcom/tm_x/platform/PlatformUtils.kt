@@ -1,5 +1,7 @@
 package org.kibbcom.tm_x.platform
 
+import org.kibbcom.tm_x.LogEntry
+
 expect class PlatformUtils() {
     fun isAndroid(): Boolean
     fun getAndroidVersion(): Int

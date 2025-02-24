@@ -1,5 +1,6 @@
 package org.kibbcom.tm_x
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -24,10 +26,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import org.kibbcom.tm_x.common.getToolbarAdditionColor
 import org.kibbcom.tm_x.platform.BackHandler
+import org.kibbcom.tm_x.screen.getCommonModifierForAdditionToolbar
 
 @Composable
 fun LogScreen(navigationState: NavigationNewState, paddingValues: PaddingValues) {
@@ -35,6 +40,13 @@ fun LogScreen(navigationState: NavigationNewState, paddingValues: PaddingValues)
         modifier = Modifier
             .fillMaxSize().padding(paddingValues)
     ) {
+
+        Column(
+            modifier = getCommonModifierForAdditionToolbar(40.dp)
+                .clip(RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp))
+                .background(getToolbarAdditionColor())
+        ) {
+        }
         BackHandler {
             navigationState.navigateBack()  // Handle back press
         }

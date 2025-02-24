@@ -309,7 +309,8 @@ fun PermissionUI(
                 }
 
                 CardItem(cardTitle, resource = Res.drawable.bluetooth, moreText = moreText, modifier = Modifier.weight(1f), colorForIcon = last_connected) {
-                    lastConnectedDevice?.let { it1 -> scanningViewModel.bondWithDevice(it1) }
+                 //   lastConnectedDevice?.let { it1 -> scanningViewModel.bondWithDevice(it1) }
+                    navigationState.navigateTo(Screen.DeviceDetailScreen)
                 }
 
 
