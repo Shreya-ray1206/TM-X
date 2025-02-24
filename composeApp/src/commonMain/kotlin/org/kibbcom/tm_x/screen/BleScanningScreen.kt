@@ -3,7 +3,6 @@ package org.kibbcom.tm_x.screen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -146,31 +145,6 @@ fun BleScanningScreen(appDatabase: AppDatabase,navigationState: NavigationNewSta
 
         }
 
-        //todo ios crashing here
-
-/*
-        LaunchedEffect(connectionState){
-            println("Screen Device got connected")
-
-            if (connectionState == BleConnectionStatus.CONNECTED ){
-                println("Screen Device read method called connected")
-
-                val serviceUuid ="EC7B0001-EDFF-4CCE-9CF8-3B175487D710"
-               // val characteristicUuid = "EC7B0004-EDFF-4CCE-9CF8-3B175487D710"
-
-                //Read and write Wifi Ssid (Read)
-                 val WIFI_SSID = "EC7B0004-EDFF-4CCE-9CF8-3B175487D710"
-
-                 val PASSWORD = "EC7B0005-EDFF-4CCE-9CF8-3B175487D710"
-
-          //      viewModel.readBleData(serviceUuid,characteristicUuid)
-                viewModel.writeBleData(serviceUuid,WIFI_SSID,"neeraj".toByteArray())
-                delay(4000)
-                viewModel.writeBleData(serviceUuid,PASSWORD,"vbvm8893".toByteArray())
-            }
-        }*/
-
-
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -289,28 +263,6 @@ fun DeviceItem(device: BleDeviceCommon, navigationState: NavigationNewState,view
     }
 
 
-/*
-    Card(
-        modifier = Modifier
-            .padding(10.dp)
-            .fillMaxWidth() // Makes width full screen
-            .wrapContentHeight() // Height adjusts based on content
-            .clip(RoundedCornerShape(18.dp)).clickable {
-
-            }
-            .border(
-                width = 1.dp,
-                color = CardBorderColor,
-                shape = RoundedCornerShape(18.dp)
-            ),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface // Light gray background
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp) // No shadow
-    )
-    {
-
-    }*/
 }
 
 

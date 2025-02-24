@@ -59,6 +59,34 @@ class ScanningViewModel(db: AppDatabase) : ViewModel(){
             _lastConnectedDevice.value = dao.getLastConnectedDevice()
         }
 
+
+        //todo ios crashing here
+
+        /*
+                LaunchedEffect(connectionState){
+                    println("Screen Device got connected")
+
+                    if (connectionState == BleConnectionStatus.CONNECTED ){
+                        println("Screen Device read method called connected")
+
+                        val serviceUuid ="EC7B0001-EDFF-4CCE-9CF8-3B175487D710"
+                       // val characteristicUuid = "EC7B0004-EDFF-4CCE-9CF8-3B175487D710"
+
+                        //Read and write Wifi Ssid (Read)
+                         val WIFI_SSID = "EC7B0004-EDFF-4CCE-9CF8-3B175487D710"
+
+                         val PASSWORD = "EC7B0005-EDFF-4CCE-9CF8-3B175487D710"
+
+                  //      viewModel.readBleData(serviceUuid,characteristicUuid)
+                        viewModel.writeBleData(serviceUuid,WIFI_SSID,"neeraj".toByteArray())
+                        delay(4000)
+                        viewModel.writeBleData(serviceUuid,PASSWORD,"vbvm8893".toByteArray())
+                    }
+                }*/
+
+
+
+
         /*
         //todo ios crashing here
         viewModelScope.launch {
