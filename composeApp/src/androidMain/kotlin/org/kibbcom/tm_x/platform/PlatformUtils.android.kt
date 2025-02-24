@@ -2,10 +2,13 @@ package org.kibbcom.tm_x.platform
 
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
+import android.content.Intent
 import android.location.LocationManager
 import android.os.Build
 import org.kibbcom.tm_x.AppContextProvider
 import android.content.pm.PackageManager
+import android.net.Uri
+
 actual class PlatformUtils {
 
     private val context : Context by lazy {
@@ -35,6 +38,13 @@ actual class PlatformUtils {
             } catch (e: PackageManager.NameNotFoundException) {
                 "Unknown"
             }
+    }
+
+    actual fun openUrl(url: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) // Required when using application context
+        }
+        context.startActivity(intent)
     }
 
 }

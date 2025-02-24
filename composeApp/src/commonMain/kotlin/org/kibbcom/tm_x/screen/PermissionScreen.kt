@@ -341,7 +341,14 @@ fun PermissionUI(
                     Text(
                         text = "TM-X Info",
                         style = MaterialTheme.typography.bodyLarge.copy(textDecoration = TextDecoration.Underline),
-                        modifier = Modifier.clickable { println("Team Info clicked!") }
+                        modifier = Modifier.clickable {
+                            val rawUrl = "www.trety.com/tm-4"
+                            val formattedUrl = formatUrl(rawUrl)
+
+                            platformUtils.openUrl(formattedUrl)
+                            println("Team Info clicked!")
+
+                        }
                     )
                 }
 
@@ -361,6 +368,15 @@ fun PermissionUI(
         }
 
 
+    }
+}
+
+fun formatUrl(url: String): String {
+    val trimmedUrl = url.trim()
+    return if (!trimmedUrl.startsWith("http://") && !trimmedUrl.startsWith("https://")) {
+        "https://$trimmedUrl" // Prefer HTTPS for security
+    } else {
+        trimmedUrl
     }
 }
 

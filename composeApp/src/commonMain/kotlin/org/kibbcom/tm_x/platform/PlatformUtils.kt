@@ -6,4 +6,5 @@ expect class PlatformUtils() {
     fun getAppVersion(): String
     fun isBluetoothEnabled(): Boolean
     fun isLocationEnabled(): Boolean // Only needed for Android, can return true on iOS
+    fun openUrl(url: String)
 }
