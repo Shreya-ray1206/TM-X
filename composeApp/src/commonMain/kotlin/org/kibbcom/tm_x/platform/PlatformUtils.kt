@@ -9,4 +9,7 @@ expect class PlatformUtils() {
     fun isBluetoothEnabled(): Boolean
     fun isLocationEnabled(): Boolean // Only needed for Android, can return true on iOS
     fun openUrl(url: String)
+    fun saveCsvFile(fileName: String, logs: List<LogEntry>): String
+    fun savePdfFile(fileName: String, logs: List<LogEntry>): String
+
 }

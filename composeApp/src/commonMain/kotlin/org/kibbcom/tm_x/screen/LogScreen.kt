@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import org.kibbcom.tm_x.common.getToolbarAdditionColor
 import org.kibbcom.tm_x.platform.BackHandler
+import org.kibbcom.tm_x.platform.PlatformUtils
 import org.kibbcom.tm_x.screen.getCommonModifierForAdditionToolbar
 
 @Composable
@@ -76,6 +77,21 @@ fun LogListSection(
         LogEntry(id = 3, message = "Yet another log", date = "14th June")
     ) }
     val noLogsVisible = logs.isEmpty()
+    val platformUtils = remember { PlatformUtils() } // ✅
+
+
+
+    val logs2 = listOf(
+        LogEntry(1, "App started", "2025-02-24"),
+        LogEntry(2, "User logged in", "2025-02-24"),
+        LogEntry(3, "Error: Uncaught Error", "2025-02-24"),
+        LogEntry(4, "Error: Network issue", "2025-02-24"),
+        LogEntry(5, "Error: Persmission issue", "2025-02-24"),
+        LogEntry(6, "Error: Network issue", "2025-02-24")
+    )
+     platformUtils.saveCsvFile("logs.csv", logs2)
+     platformUtils.savePdfFile("logs.pdf", logs2)
+
 
     Column(
         modifier = Modifier

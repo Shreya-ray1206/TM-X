@@ -7,7 +7,14 @@ import android.location.LocationManager
 import android.os.Build
 import org.kibbcom.tm_x.AppContextProvider
 import android.content.pm.PackageManager
+import android.graphics.pdf.PdfDocument
 import android.net.Uri
+import android.os.Environment
+import kotlinx.io.IOException
+import org.kibbcom.tm_x.LogEntry
+import java.io.File
+import java.io.FileOutputStream
+import java.io.FileWriter
 
 actual class PlatformUtils {
 
@@ -45,6 +52,68 @@ actual class PlatformUtils {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) // Required when using application context
         }
         context.startActivity(intent)
+    }
+
+    actual fun saveCsvFile(
+        fileName: String,
+        logs: List<LogEntry>
+    ): String {
+        val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val file = File(downloadsDir, fileName)
+
+        FileWriter(file).use { writer ->
+            writer.append("ID,Message,Date\n") // CSV header
+            logs.forEach { log ->
+                writer.append("${log.id},\"${log.message}\",${log.date}\n")
+            }
+        }
+
+        return file.absolutePath
+
+
+
+    }
+
+    actual fun savePdfFile(
+        fileName: String,
+        logs: List<LogEntry>
+    ): String {
+
+        val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val file = File(downloadsDir, fileName)
+
+        val pdfDocument = PdfDocument()
+        val pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create() // A4 Size: 595x842 points
+        val page = pdfDocument.startPage(pageInfo)
+
+        val canvas = page.canvas
+        val paint = android.graphics.Paint()
+        paint.textSize = 16f
+
+        var y = 50f // Start Y position
+        canvas.drawText("Logs Report", 200f, y, paint) // Title
+        y += 40f
+
+        // Draw log entries
+        logs.forEach { log ->
+            canvas.drawText("ID: ${log.id}, Message: ${log.message}, Date: ${log.date}", 50f, y, paint)
+            y += 30f
+        }
+
+        pdfDocument.finishPage(page)
+
+        try {
+            FileOutputStream(file).use { outputStream ->
+                pdfDocument.writeTo(outputStream)
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return "Error: ${e.message}"
+        } finally {
+            pdfDocument.close()
+        }
+
+        return file.absolutePath
     }
 
 }
