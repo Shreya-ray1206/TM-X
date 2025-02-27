@@ -55,7 +55,7 @@ actual class PlatformUtils : NSObject() {
     actual fun openUrl(url: String) {
         val nsUrl = NSURL.URLWithString(url)
         if (nsUrl != null) {
-            UIApplication.sharedApplication.openURL(nsUrl)
+            UIApplication.sharedApplication().openURL(nsUrl)
         }
     }
 
