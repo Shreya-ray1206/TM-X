@@ -170,7 +170,7 @@ fun PermissionUI(
         val connectionState by scanningViewModel.connectionState.collectAsState()
         // Top Box with Rounded Bottom Corners
         Column(
-                 modifier = getCommonModifierForAdditionToolbar(100.dp)
+                 modifier = getCommonModifierForAdditionToolbar(120.dp)
                 .clip(RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp))
                 .background(getToolbarAdditionColor()) // Change to darkPrimaryGrey if needed
         ) {

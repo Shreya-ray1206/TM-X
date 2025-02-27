@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -220,8 +221,6 @@ fun DeviceItem(device: BleDeviceCommon, navigationState: NavigationNewState,view
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
-
-                // MAC Address, Signal Strength, and Connect Button in a Row
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -229,14 +228,16 @@ fun DeviceItem(device: BleDeviceCommon, navigationState: NavigationNewState,view
                 ) {
                     // MAC Address and Signal Strength
                     Row(
+                        modifier = Modifier.weight(1f), // Ensures text takes available space without pushing the button out
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
                             text = device.id,
                             fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f) // Dark gray text (70% opacity)
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                            maxLines = 1, // Prevents text from wrapping
+                            overflow = TextOverflow.Ellipsis // Adds "..." if text is too long
                         )
-
                     }
 
                     // Connect Button
@@ -247,8 +248,8 @@ fun DeviceItem(device: BleDeviceCommon, navigationState: NavigationNewState,view
                         },
                         enabled = true,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.secondary, // Blue button in M3
-                            contentColor = Color.White // White text
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            contentColor = Color.White
                         ),
                         modifier = Modifier.wrapContentWidth()
                     ) {
@@ -258,6 +259,7 @@ fun DeviceItem(device: BleDeviceCommon, navigationState: NavigationNewState,view
                         )
                     }
                 }
+
             }
         }
     }
