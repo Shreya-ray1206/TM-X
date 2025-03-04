@@ -10,7 +10,6 @@ expect class BleManager() {
     val beaconScanResults: StateFlow<List<BeaconDevice>>
     val connectionState: StateFlow<BleConnectionStatus>
     val readDataResult: StateFlow<Pair<String, ByteArray>?> // 🔥 New state for characteristic read
-
     fun scanBleDevices()
     fun stopBLEScanning()
     fun scanBeaconDevices()
