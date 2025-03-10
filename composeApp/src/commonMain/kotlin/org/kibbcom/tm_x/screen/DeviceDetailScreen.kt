@@ -2,32 +2,56 @@ package org.kibbcom.tm_x.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.kibbcom.tm_x.NavigationNewState
-import org.kibbcom.tm_x.ble.BleConnectionStatus
+import org.kibbcom.tm_x.common.getCommonCardColor
 import org.kibbcom.tm_x.common.getToolbarAdditionColor
 import org.kibbcom.tm_x.platform.BackHandler
 import tm_x.composeapp.generated.resources.Res
+import tm_x.composeapp.generated.resources.accelerometer
+import tm_x.composeapp.generated.resources.accelerometer_status
+import tm_x.composeapp.generated.resources.beacon
 import tm_x.composeapp.generated.resources.bluetooth
+import tm_x.composeapp.generated.resources.date_time
+import tm_x.composeapp.generated.resources.device_information
+import tm_x.composeapp.generated.resources.firmware_version
+import tm_x.composeapp.generated.resources.ic_arrow_down
+import tm_x.composeapp.generated.resources.ic_arrow_up
+import tm_x.composeapp.generated.resources.manufacture
+import tm_x.composeapp.generated.resources.model_number
+import tm_x.composeapp.generated.resources.scan_ble
+import tm_x.composeapp.generated.resources.serial_number
+import tm_x.composeapp.generated.resources.software_version
 
 
 @Composable
@@ -47,6 +71,9 @@ fun DeviceDetailScreen(navigationState: NavigationNewState, paddingValues: Paddi
         ) {
         }
 
+        DeviceInfoCard()
+
+        DeviceAccelerometerCard()
 
         BackHandler {
             navigationState.navigateBack()  // Handle back press
@@ -54,3 +81,149 @@ fun DeviceDetailScreen(navigationState: NavigationNewState, paddingValues: Paddi
 
     }
 }
+@Composable
+fun DeviceInfoCard() {
+    var isExpanded by remember { mutableStateOf(true) } // State to track expansion
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        shape = RoundedCornerShape(8.dp),
+        elevation = CardDefaults.cardElevation(8.dp),
+        colors = CardDefaults.cardColors(containerColor = getCommonCardColor())
+    ) {
+        Column {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { isExpanded = !isExpanded } // Toggle expansion
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val iconTint = if (isSystemInDarkTheme()) Color.White else Color.Black
+
+                Image(
+                    painter = painterResource(Res.drawable.bluetooth),
+                    contentDescription = "Bluetooth Icon",
+                    modifier = Modifier.size(40.dp).padding(8.dp),
+                    colorFilter =  ColorFilter.tint(iconTint)
+                )
+
+                Text(
+                    text = stringResource(Res.string.device_information),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 8.dp),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+                Image(
+                    painter = if (isExpanded) painterResource(Res.drawable.ic_arrow_up) else painterResource(Res.drawable.ic_arrow_down),
+                    contentDescription = "Beacon Icon",
+                    modifier = Modifier.size(20.dp).padding(2.dp),
+                    colorFilter =  ColorFilter.tint(iconTint)
+                )
+            }
+
+            // Expandable content
+            if (isExpanded) {
+                Column() {
+                    Divider(color = Color.Gray, thickness = 1.dp)
+                    InfoRow(stringResource(Res.string.manufacture), "tmx-1234-xyz")
+                    InfoRow(stringResource(Res.string.model_number), "tmx-1234-xyz")
+                    InfoRow(stringResource(Res.string.firmware_version), "fmv-123")
+                    InfoRow(stringResource(Res.string.software_version), "soft-123")
+                    InfoRow(stringResource(Res.string.serial_number), "TMX-123")
+                    InfoRow(stringResource(Res.string.date_time), "25th Feb 2025 16:40")
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun DeviceAccelerometerCard() {
+    var isExpanded by remember { mutableStateOf(false) } // State to track expansion
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        shape = RoundedCornerShape(8.dp),
+        elevation = CardDefaults.cardElevation(8.dp),
+        colors = CardDefaults.cardColors(containerColor = getCommonCardColor())
+    ) {
+        Column {
+            val iconTint = if (isSystemInDarkTheme()) Color.White else Color.Black
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { isExpanded = !isExpanded } // Toggle expansion
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(Res.drawable.accelerometer),
+                    contentDescription = "Bluetooth Icon",
+                    modifier = Modifier.size(40.dp).padding(8.dp),
+                    colorFilter =  ColorFilter.tint(iconTint)
+                )
+
+                Text(
+                    text = stringResource(Res.string.accelerometer_status),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 8.dp),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+                Image(
+                    painter = if (isExpanded) painterResource(Res.drawable.ic_arrow_up) else painterResource(Res.drawable.ic_arrow_down),
+                    contentDescription = "Beacon Icon",
+                    modifier = Modifier.size(20.dp).padding(2.dp),
+                    colorFilter =  ColorFilter.tint(iconTint)
+                )
+            }
+
+            // Expandable content
+            if (isExpanded) {
+                Column() {
+                    Divider(color = Color.Gray, thickness = 1.dp)
+
+                }
+            }
+        }
+    }
+}
+
+// Helper function for displaying info rows
+@Composable
+fun InfoRow(label: String, value: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp), // Add padding for better spacing
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.weight(1f) // Pushes the second text to the right
+        )
+
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.End, // Aligns text to the right
+            modifier = Modifier.fillMaxWidth(0.3f) // Ensures it stays at the right
+        )
+    }
+}
+

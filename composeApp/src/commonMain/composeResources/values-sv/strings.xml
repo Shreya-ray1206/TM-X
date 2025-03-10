@@ -21,6 +21,15 @@
     <string name="user_manual">Användarmanual</string>
     <string name="version_info">Versionsinformation</string>
     <string name="copyright">Upphovsrätt ©2025</string>
+    <string name="manufacture">Tillverkare</string>
+    <string name="model_number">Modellnummer</string>
+    <string name="firmware_version">Firmwareversion</string>
+    <string name="software_version">Programvaruversion</string>
+    <string name="serial_number">Serienummer</string>
+    <string name="date_time">Datum och tid</string>
+    <string name="device_information">Enhetsinformation</string>
+    <string name="accelerometer_status">Accelerometerstatus</string>
+
 
 
 

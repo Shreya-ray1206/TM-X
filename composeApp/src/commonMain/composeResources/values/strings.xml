@@ -21,4 +21,13 @@
     <string name = "user_manual">User Manual</string>
     <string name = "version_info">Version Info</string>
     <string name = "copyright">Copyright ©2025</string>
+    <string name = "manufacture">Manufacture</string>
+    <string name = "model_number">Model number</string>
+    <string name = "firmware_version">Firmware version</string>
+    <string name = "software_version">Software version</string>
+    <string name = "serial_number">Serial number</string>
+    <string name = "date_time">Date and time</string>
+    <string name = "device_information">Device Information</string>
+    <string name = "accelerometer_status">Accelerometer status</string>
+
 </resources>
