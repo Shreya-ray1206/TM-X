@@ -40,7 +40,6 @@ import org.kibbcom.tm_x.platform.BackHandler
 import tm_x.composeapp.generated.resources.Res
 import tm_x.composeapp.generated.resources.accelerometer
 import tm_x.composeapp.generated.resources.accelerometer_status
-import tm_x.composeapp.generated.resources.beacon
 import tm_x.composeapp.generated.resources.bluetooth
 import tm_x.composeapp.generated.resources.date_time
 import tm_x.composeapp.generated.resources.device_information
@@ -49,7 +48,6 @@ import tm_x.composeapp.generated.resources.ic_arrow_down
 import tm_x.composeapp.generated.resources.ic_arrow_up
 import tm_x.composeapp.generated.resources.manufacture
 import tm_x.composeapp.generated.resources.model_number
-import tm_x.composeapp.generated.resources.scan_ble
 import tm_x.composeapp.generated.resources.serial_number
 import tm_x.composeapp.generated.resources.software_version
 
