@@ -19,6 +19,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +32,15 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.patrykandpatrick.vico.multiplatform.cartesian.CartesianChartHost
+import com.patrykandpatrick.vico.multiplatform.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.multiplatform.cartesian.data.lineSeries
+import com.patrykandpatrick.vico.multiplatform.cartesian.layer.rememberLineCartesianLayer
+import com.patrykandpatrick.vico.multiplatform.cartesian.axis.HorizontalAxis
+import com.patrykandpatrick.vico.multiplatform.cartesian.axis.VerticalAxis
+import com.patrykandpatrick.vico.multiplatform.cartesian.rememberCartesianChart
+
+
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.kibbcom.tm_x.NavigationNewState
@@ -194,11 +204,32 @@ fun DeviceAccelerometerCard() {
             if (isExpanded) {
                 Column() {
                     Divider(color = Color.Gray, thickness = 1.dp)
+                    ComposeMultiplatformBasicLineChart()
 
                 }
             }
         }
     }
+}
+
+@Composable
+fun ComposeMultiplatformBasicLineChart() {
+    val modelProducer = remember { CartesianChartModelProducer() }
+    LaunchedEffect(Unit) {
+        modelProducer.runTransaction {
+            lineSeries { series(13, 8, 7, 12, 0, 1, 15, 14, 0, 11, 6, 12, 0, 11, 12, 11) }
+        }
+    }
+    CartesianChartHost(
+        chart =
+            rememberCartesianChart(
+                rememberLineCartesianLayer(),
+                startAxis = VerticalAxis.rememberStart(),
+                bottomAxis = HorizontalAxis.rememberBottom(),
+            ),
+        modelProducer = modelProducer,
+
+    )
 }
 
 // Helper function for displaying info rows

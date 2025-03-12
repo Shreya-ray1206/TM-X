@@ -13,6 +13,7 @@ lifecycleViewModel = "2.8.7"
 lifecycleViewModelCompose = "2.8.4"
 runtimeAndroid = "1.7.8"
 bluetooth = "1.0.0-alpha02"
+vico = "2.1.0-alpha.2"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
@@ -39,6 +40,8 @@ lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifec
 androidx-runtime-android = { group = "androidx.compose.runtime", name = "runtime-android", version.ref = "runtimeAndroid" }
 androidx-bluetooth = { group = "androidx.bluetooth", name = "bluetooth", version.ref = "bluetooth" }
 
+
+vico = { group = "com.patrykandpatrick.vico", name = "multiplatform", version.ref = "vico" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

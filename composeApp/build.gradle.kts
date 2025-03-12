@@ -74,6 +74,7 @@ kotlin {
             implementation(libs.androidx.core.ktx)
             api(libs.kotlinx.coroutines.core)
 
+            implementation(libs.vico)
 
             //Room step1
             implementation("androidx.room:room-runtime:2.7.0-beta01")
