@@ -5,8 +5,9 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.roomLibrary)
     //Room step2 -> plugins
-    id("androidx.room") version "2.7.0-beta01"
+   // id("androidx.room") version "2.7.0-rc01"
     id("com.google.devtools.ksp") version "2.1.10-1.0.29" //ksp for room annotation processing
 
 }
@@ -77,7 +78,7 @@ kotlin {
             implementation(libs.vico)
 
             //Room step1
-            implementation("androidx.room:room-runtime:2.7.0-beta01")
+            implementation(libs.androidx.room.runtime)
             implementation("androidx.sqlite:sqlite-bundled:2.5.0-SNAPSHOT") //for sqlite drivers related
 
         }

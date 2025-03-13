@@ -8,11 +8,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -38,7 +42,13 @@ import com.patrykandpatrick.vico.multiplatform.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.multiplatform.cartesian.layer.rememberLineCartesianLayer
 import com.patrykandpatrick.vico.multiplatform.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.multiplatform.cartesian.axis.VerticalAxis
+import com.patrykandpatrick.vico.multiplatform.cartesian.data.columnSeries
+import com.patrykandpatrick.vico.multiplatform.cartesian.layer.ColumnCartesianLayer
+import com.patrykandpatrick.vico.multiplatform.cartesian.layer.LineCartesianLayer
+import com.patrykandpatrick.vico.multiplatform.cartesian.layer.rememberColumnCartesianLayer
 import com.patrykandpatrick.vico.multiplatform.cartesian.rememberCartesianChart
+import com.patrykandpatrick.vico.multiplatform.common.component.rememberLineComponent
+import com.patrykandpatrick.vico.multiplatform.common.fill
 
 
 import org.jetbrains.compose.resources.painterResource
@@ -67,7 +77,8 @@ fun DeviceDetailScreen(navigationState: NavigationNewState, paddingValues: Paddi
     Column(
         modifier = Modifier
             .fillMaxSize().padding(paddingValues)
-            .background(MaterialTheme.colorScheme.background), // Uses M3 background color
+            .background(MaterialTheme.colorScheme.background)
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -206,31 +217,17 @@ fun DeviceAccelerometerCard() {
                     Divider(color = Color.Gray, thickness = 1.dp)
                     ComposeMultiplatformBasicLineChart()
 
+                    Spacer(Modifier.height((10.dp)))
+
+                    ComposeMultiplatformBasicColumnChart()
+                    Spacer(Modifier.height((10.dp)))
+                    ComposeMultiplatformBasicComboChart()
                 }
             }
         }
     }
 }
 
-@Composable
-fun ComposeMultiplatformBasicLineChart() {
-    val modelProducer = remember { CartesianChartModelProducer() }
-    LaunchedEffect(Unit) {
-        modelProducer.runTransaction {
-            lineSeries { series(13, 8, 7, 12, 0, 1, 15, 14, 0, 11, 6, 12, 0, 11, 12, 11) }
-        }
-    }
-    CartesianChartHost(
-        chart =
-            rememberCartesianChart(
-                rememberLineCartesianLayer(),
-                startAxis = VerticalAxis.rememberStart(),
-                bottomAxis = HorizontalAxis.rememberBottom(),
-            ),
-        modelProducer = modelProducer,
-
-    )
-}
 
 // Helper function for displaying info rows
 @Composable
@@ -256,3 +253,71 @@ fun InfoRow(label: String, value: String) {
     }
 }
 
+
+@Composable
+fun ComposeMultiplatformBasicLineChart() {
+    val modelProducer = remember { CartesianChartModelProducer() }
+    LaunchedEffect(Unit) {
+        modelProducer.runTransaction {
+            lineSeries { series(13, 8, 7, 12, 0, 1, 15, 14, 0, 11, 6, 12, 0, 11, 12, 11) }
+        }
+    }
+    CartesianChartHost(
+        chart =
+            rememberCartesianChart(
+                rememberLineCartesianLayer(),
+                startAxis = VerticalAxis.rememberStart(),
+                bottomAxis = HorizontalAxis.rememberBottom(),
+            ),
+        modelProducer = modelProducer,
+
+        )
+}
+
+@Composable
+fun ComposeMultiplatformBasicColumnChart() {
+    val modelProducer = remember { CartesianChartModelProducer() }
+    LaunchedEffect(Unit) {
+        modelProducer.runTransaction {
+            columnSeries { series(5, 6, 5, 2, 11, 8, 5, 2, 15, 11, 8, 13, 12, 10, 2, 7) }
+        }
+    }
+    CartesianChartHost(
+        chart =
+            rememberCartesianChart(
+                rememberColumnCartesianLayer(),
+                startAxis = VerticalAxis.rememberStart(),
+                bottomAxis = HorizontalAxis.rememberBottom(),
+            ),
+        modelProducer = modelProducer,
+    )
+}
+
+@Composable
+fun ComposeMultiplatformBasicComboChart() {
+    val modelProducer = remember { CartesianChartModelProducer() }
+    LaunchedEffect(Unit) {
+        modelProducer.runTransaction {
+            columnSeries { series(4, 15, 5, 8, 10, 15, 9, 10, 7, 9, 10, 12, 2, 9, 5, 14) }
+            lineSeries { series(1, 5, 4, 7, 3, 14, 5, 9, 9, 14, 7, 13, 14, 4, 10, 12) }
+        }
+    }
+    CartesianChartHost(
+        rememberCartesianChart(
+            rememberColumnCartesianLayer(
+                ColumnCartesianLayer.ColumnProvider.series(
+                    rememberLineComponent(fill = fill(Color(0xffffc002)), thickness = 16.dp)
+                )
+            ),
+            rememberLineCartesianLayer(
+                LineCartesianLayer.LineProvider.series(
+                    LineCartesianLayer.Line(LineCartesianLayer.LineFill.single(fill(Color(0xffee2b2b))))
+                )
+            ),
+            startAxis = VerticalAxis.rememberStart(),
+            bottomAxis = HorizontalAxis.rememberBottom(),
+        ),
+        modelProducer,
+
+    )
+}
