@@ -24,6 +24,9 @@ actual class BleManager actual constructor() : NSObject(), CBCentralManagerDeleg
     actual val bleDevicesScanResults: StateFlow<List<BleDeviceCommon>> = _scanResults.asStateFlow()
     private val _connectionState = MutableStateFlow(BleConnectionStatus.IDLE)
     actual val connectionState = _connectionState.asStateFlow()
+    private val _scanBeaconResults = MutableStateFlow<List<BeaconDevice>>(emptyList())
+    actual val beaconScanResults: StateFlow<List<BeaconDevice>> = _scanBeaconResults.asStateFlow()
+
 
     init {
         centralManager = CBCentralManager(this, null)
@@ -154,8 +157,7 @@ actual class BleManager actual constructor() : NSObject(), CBCentralManagerDeleg
     ) {
     }
 
-    actual val beaconScanResults: StateFlow<List<BeaconDevice>>
-        get() = TODO("Not yet implemented")
+
 
     actual fun scanBeaconDevices() {
     }

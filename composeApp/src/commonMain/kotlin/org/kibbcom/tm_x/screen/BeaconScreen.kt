@@ -148,10 +148,12 @@ fun BeaconScreen(db: AppDatabase, navigationState: NavigationNewState, paddingVa
             )
         }
 
+        val nearbyBeaconDevices by viewModel.nearbyBeaconDevices.collectAsState()
+
         Spacer(modifier = Modifier.height(16.dp))
 
         LazyColumn {
-            items(beaconDevice) { device ->
+            items(nearbyBeaconDevices) { device ->
 
                 BeaconItem(device,viewModel)
 
@@ -188,29 +190,51 @@ fun BeaconItem(beacon: BeaconDevice, viewModel: BeaconViewModel) {
                 color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Mac Address: ${beacon.macAddress}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "UUID: ${beacon.macAddress}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Company: ${beacon.companyId}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.height(8.dp))
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "Mac Address : ${beacon.macAddress}",
+                    text = "Length: ${beacon.length}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                     modifier = Modifier.weight(1f)
                 )
                 Text(
-                    text = "Rssi : ${ beacon.rssi}",
+                    text = "Rssi: ${ beacon.rssi}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.End
                 )
             }
+
             Spacer(modifier = Modifier.height(8.dp))
 
             Row() {
                 Text(
-                    text = "Major : ${beacon.major} Minor : ${beacon.minor}",
+                    text = "Major: ${beacon.major} Minor: ${beacon.minor}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                     modifier = Modifier.weight(1f)

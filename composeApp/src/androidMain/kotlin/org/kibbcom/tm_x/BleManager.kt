@@ -118,11 +118,43 @@ actual class BleManager actual constructor() {
             println("Beacon Scan result $iBeacon")
             println("Beacon Scan result $eddystone")
 
+            if (scanRecord != null) {
+                val iBeaconManufactureData = scanRecord.getManufacturerSpecificData(0x004C)
+                if (iBeaconManufactureData != null && iBeaconManufactureData.size >= 23) {
+
+
+                    val length = iBeaconManufactureData.size
+                    val companyId = 0x004C
+                    val type = iBeaconManufactureData[0].toInt()
+                    val uuidBytes = iBeaconManufactureData.copyOfRange(2, 18)
+                    val iBeaconUUID = convertToUUIDString(uuidBytes)
+                    val major = (iBeaconManufactureData[18].toInt() and 0xFF) shl 8 or (iBeaconManufactureData[19].toInt() and 0xFF)
+                    val minor = (iBeaconManufactureData[20].toInt() and 0xFF) shl 8 or (iBeaconManufactureData[21].toInt() and 0xFF)
+                    // Extract TX power level (calibrated RSSI at 1 meter)
+                    val txPowerCalibratedRSSI = iBeaconManufactureData[22].toInt()
+
+
+                    val beaconDevice =  BeaconDevice("iBeacon",
+                        result.device.address,txPowerCalibratedRSSI.toString(),iBeaconUUID,
+                        major,minor,length,companyId =companyId.toString())
+
+                    val updatedList = _beaconScanResults.value.toMutableList().apply { add(beaconDevice) }
+                    _beaconScanResults.value = updatedList.distinctBy { it.macAddress }
+
+                }
+            }
+
+
+
+
+            _beaconScanResults.value = _beaconScanResults.value.distinctBy { it.macAddress }
+/*
+
             val beaconDevice = when {
                 iBeacon != null -> BeaconDevice(
                     macAddress = result.device.address,
                     name = "iBeacon",
-                    rssi ="fdjk",
+                    rssi ="unknown",
                     uuid = iBeacon.uuid,
                     major = iBeacon.major,
                     minor = iBeacon.minor
@@ -130,45 +162,16 @@ actual class BleManager actual constructor() {
                 eddystone != null -> BeaconDevice(
                     macAddress = result.device.address,
                     name = "Eddystone",
-                    rssi = "endy rssi",
+                    rssi = "unknown",
                     namespace = eddystone.namespace,
                     instanceId = eddystone.instanceId
                 )
                 else -> return // Ignore non-beacon devices
             }
 
-            // Update the StateFlow to notify UI
-            val updatedList = _beaconScanResults.value.toMutableList().apply { add(beaconDevice) }
-            _beaconScanResults.value = updatedList.distinctBy { it.macAddress }
-
-        /*   // beacon.manufacturer = result.device.name
-
-            val iBeacon = parseIBeacon(bytes)
-            val eddystone = parseEddystone(bytes)
-            println("Beacon Scan result $iBeacon")
-            println("Beacon Scan result $eddystone")
-            val beaconDevice = when {
-                iBeacon != null -> BeaconDevice(
-                    macAddress = result.device.address,
-                    name = "iBeacon",
-                    rssi = result.rssi.toString(),
-                    major = iBeacon.major,
-                    minor = iBeacon.minor,
-                    uuid = iBeacon.uuid
-                )
-                eddystone != null -> BeaconDevice(
-                    macAddress = result.device.address,
-                    name = "Eddystone",
-                    rssi = result.rssi.toString(),
-                    namespace = eddystone.namespace,
-                    instanceId = eddystone.instanceId
-                )
-                else -> return // Ignore non-beacon devices
-            }
 */
-            // Update list without duplicates
 
-            _beaconScanResults.value = _beaconScanResults.value.distinctBy { it.macAddress }
+
         }
     }
 

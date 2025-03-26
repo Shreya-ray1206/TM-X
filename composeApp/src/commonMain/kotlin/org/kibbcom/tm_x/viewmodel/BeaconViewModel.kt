@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.kibbcom.tm_x.BleManager
 import org.kibbcom.tm_x.db.AppDatabase
@@ -24,11 +25,11 @@ class BeaconViewModel(private val db: AppDatabase) : ViewModel() {
 
    init {
        //todo ios crashing here
-       /* viewModelScope.launch {
+       viewModelScope.launch {
             bleManager.beaconScanResults.collectLatest { scannedDevices ->
                 _nearbyBeaconDevices.value = scannedDevices
             }
-        }*/
+        }
 
         // Load saved beacons from the database when ViewModel initializes
         viewModelScope.launch {
