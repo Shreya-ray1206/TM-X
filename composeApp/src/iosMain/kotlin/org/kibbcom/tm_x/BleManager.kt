@@ -27,6 +27,8 @@ actual class BleManager actual constructor() : NSObject(), CBCentralManagerDeleg
     private val _scanBeaconResults = MutableStateFlow<List<BeaconDevice>>(emptyList())
     actual val beaconScanResults: StateFlow<List<BeaconDevice>> = _scanBeaconResults.asStateFlow()
 
+    actual val readDataResult: StateFlow<Pair<String, ByteArray>?>
+        get() = TODO("Not yet implemented")
 
     init {
         centralManager = CBCentralManager(this, null)
@@ -144,8 +146,6 @@ actual class BleManager actual constructor() : NSObject(), CBCentralManagerDeleg
         } ?: println("Device not found")
     }
 
-    actual val readDataResult: StateFlow<Pair<String, ByteArray>?>
-        get() = TODO("Not yet implemented")
 
     actual fun readBleData(serviceId: String, characteristicUuid: String) {
     }

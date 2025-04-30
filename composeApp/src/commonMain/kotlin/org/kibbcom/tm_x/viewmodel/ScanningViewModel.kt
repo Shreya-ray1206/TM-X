@@ -1,7 +1,10 @@
 package org.kibbcom.tm_x.viewmodel
 
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.ktor.utils.io.charsets.Charsets
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,6 +22,7 @@ class ScanningViewModel(db: AppDatabase) : ViewModel(){
     private val dao = db.getBleDao()
     private var bondingDevice: BleDeviceCommon? = null
 
+
     private val _devicesNative = MutableStateFlow<List<BleDeviceCommon>>(emptyList())
     val devicesNative: StateFlow<List<BleDeviceCommon>> = _devicesNative.asStateFlow()
 
@@ -29,7 +33,8 @@ class ScanningViewModel(db: AppDatabase) : ViewModel(){
     private val _lastConnectedDevice = MutableStateFlow<BleDeviceCommon?>(null)
     val lastConnectedDevice : StateFlow<BleDeviceCommon?> = _lastConnectedDevice.asStateFlow()
 
-
+    private val _readDataResult = MutableStateFlow<Pair<String, ByteArray>?>(null)
+    val readDataResult: StateFlow<Pair<String, ByteArray>?> = _readDataResult
 
     init {
         viewModelScope.launch {
@@ -47,60 +52,36 @@ class ScanningViewModel(db: AppDatabase) : ViewModel(){
                     bondingDevice?.let {
                         println("BLE Connection State Updated to connected then saved value $state")
                         saveLastConnectedDevice(it)
-                        //bondingDevice = null // Reset after saving
+                        delay(5000)
+                        deviceInfo()
                     }
                 }
-
-
             }
         }
+        observeReadData()
 
         viewModelScope.launch {
             _lastConnectedDevice.value = dao.getLastConnectedDevice()
         }
 
+    }
 
-        //todo ios crashing here
-
-        /*
-                LaunchedEffect(connectionState){
-                    println("Screen Device got connected")
-
-                    if (connectionState == BleConnectionStatus.CONNECTED ){
-                        println("Screen Device read method called connected")
-
-                        val serviceUuid ="EC7B0001-EDFF-4CCE-9CF8-3B175487D710"
-                       // val characteristicUuid = "EC7B0004-EDFF-4CCE-9CF8-3B175487D710"
-
-                        //Read and write Wifi Ssid (Read)
-                         val WIFI_SSID = "EC7B0004-EDFF-4CCE-9CF8-3B175487D710"
-
-                         val PASSWORD = "EC7B0005-EDFF-4CCE-9CF8-3B175487D710"
-
-                  //      viewModel.readBleData(serviceUuid,characteristicUuid)
-                        viewModel.writeBleData(serviceUuid,WIFI_SSID,"neeraj".toByteArray())
-                        delay(4000)
-                        viewModel.writeBleData(serviceUuid,PASSWORD,"vbvm8893".toByteArray())
-                    }
-                }*/
-
-
-
-
-        /*
-        //todo ios crashing here
+    private fun observeReadData() {
         viewModelScope.launch {
+
             bleManager.readDataResult.collectLatest { state ->
-                state?.let { (stringValue, byteArrayValue) ->
+                _readDataResult.value = state
+                state?.let { (name, data) ->
+                    val dataString = data.decodeToString()
 
-                    println("Read Scanning viewmodel ! Data (HEX): ${byteArrayValue.toHexString()}")
-
-
+                    println("Mukesh Result String: $name, ByteArray size: ${dataString}")
+                    _readDataResult.value = state // Update StateFlow if needed
                 }
+
             }
         }
-*/
     }
+
     fun scanDevices() {
         bleManager.scanBleDevices()
     }
@@ -136,6 +117,32 @@ class ScanningViewModel(db: AppDatabase) : ViewModel(){
             _lastConnectedDevice.value = dao.getLastConnectedDevice()
         }
     }
+
+    fun deviceInfo(){
+
+        val SERVICE_UUID_DEVICE_INFORMATION = "0000180a-0000-1000-8000-00805f9b34fb";
+        val MODEL_NUMBER_STRING = "00002A24-0000-1000-8000-00805f9b34fb"
+        val SERIAL_NUMBER_STRING = "00002A25-0000-1000-8000-00805f9b34fb"
+        val HARDWARE_REVISION_STRING = "00002A27-0000-1000-8000-00805f9b34fb"
+        val FIRMWARE_REVISION_STRING = "00002A26-0000-1000-8000-00805f9b34fb"
+        val MANUFACTURER_NAME_STRING = "00002A29-0000-1000-8000-00805f9b34fb"
+
+
+        readBleData(serviceId = SERVICE_UUID_DEVICE_INFORMATION,
+            characteristicUuid = FIRMWARE_REVISION_STRING )
+        readBleData(serviceId = SERVICE_UUID_DEVICE_INFORMATION,
+            characteristicUuid = MODEL_NUMBER_STRING )
+        readBleData(serviceId = SERVICE_UUID_DEVICE_INFORMATION,
+            characteristicUuid = HARDWARE_REVISION_STRING )
+        readBleData(serviceId = SERVICE_UUID_DEVICE_INFORMATION,
+            characteristicUuid = SERIAL_NUMBER_STRING )
+        readBleData(serviceId = SERVICE_UUID_DEVICE_INFORMATION,
+            characteristicUuid = MANUFACTURER_NAME_STRING )
+
+
+    }
+
+
 
 
 }

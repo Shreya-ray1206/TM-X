@@ -1,5 +1,6 @@
 package org.kibbcom.tm_x
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -19,15 +20,40 @@ import android.content.IntentFilter
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import androidx.annotation.RequiresPermission
 import androidx.room.PrimaryKey
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import org.kibbcom.tm_x.ble.BleConnectionStatus
 import org.kibbcom.tm_x.models.BeaconDevice
 import org.kibbcom.tm_x.models.BleDeviceCommon
 import java.util.UUID
 
 actual class BleManager actual constructor() {
+
+
+    private val bleReadQueue = Channel<BleReadRequest>(Channel.UNLIMITED)
+    private data class BleReadRequest(val serviceId: String, val characteristicUuid: String)
+
+    init {
+        processReadQueue()
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun processReadQueue() {
+        CoroutineScope(Dispatchers.IO).launch {
+            for (request in bleReadQueue) {
+                readCharacteristic(request.serviceId, request.characteristicUuid)
+            }
+        }
+    }
+
 
     private val context : Context by lazy {
         AppContextProvider.getContext()
@@ -148,28 +174,6 @@ actual class BleManager actual constructor() {
 
 
             _beaconScanResults.value = _beaconScanResults.value.distinctBy { it.macAddress }
-/*
-
-            val beaconDevice = when {
-                iBeacon != null -> BeaconDevice(
-                    macAddress = result.device.address,
-                    name = "iBeacon",
-                    rssi ="unknown",
-                    uuid = iBeacon.uuid,
-                    major = iBeacon.major,
-                    minor = iBeacon.minor
-                )
-                eddystone != null -> BeaconDevice(
-                    macAddress = result.device.address,
-                    name = "Eddystone",
-                    rssi = "unknown",
-                    namespace = eddystone.namespace,
-                    instanceId = eddystone.instanceId
-                )
-                else -> return // Ignore non-beacon devices
-            }
-
-*/
 
 
         }
@@ -218,54 +222,7 @@ actual class BleManager actual constructor() {
 
 
 
-    private val leScanCallback: ScanCallback = object : ScanCallback() {
-        override fun onScanResult(callbackType: Int, result: ScanResult) {
-            val scanRecord = result.scanRecord
 
-
-         /*   val beacon = Beacon(result.device.address)
-            beacon.manufacturer = result.device.name
-            beacon.rssi = result.rssi
-            if (scanRecord != null) {
-                val iBeaconManufactureData = scanRecord.getManufacturerSpecificData(0x004C)
-                if (iBeaconManufactureData != null && iBeaconManufactureData.size >= 23) {
-
-                    Log.e("BEACON", "Manufacturer Data: ${iBeaconManufactureData.toHexString()}")
-
-                    val length = iBeaconManufactureData.size
-                    val companyId = 0x004C
-                    val type = iBeaconManufactureData[0].toInt()
-                    val uuidBytes = iBeaconManufactureData.copyOfRange(2, 18)
-                    val iBeaconUUID = convertToUUIDString(uuidBytes)
-                    val major = (iBeaconManufactureData[18].toInt() and 0xFF) shl 8 or (iBeaconManufactureData[19].toInt() and 0xFF)
-                    val minor = (iBeaconManufactureData[20].toInt() and 0xFF) shl 8 or (iBeaconManufactureData[21].toInt() and 0xFF)
-                    // Extract TX power level (calibrated RSSI at 1 meter)
-                    val txPowerCalibratedRSSI = iBeaconManufactureData[22].toInt()
-                    beacon.type = Beacon.beaconType.iBeacon
-                    beacon.uuid = iBeaconUUID
-                    beacon.major = major
-                    beacon.minor = minor
-                    beacon.length = length
-                    beacon.company = companyId
-                    beacon.rssi = txPowerCalibratedRSSI // Store TX power level
-                    beacon.typeId = type.toString()
-
-                    Log.e("BEACON", "iBeaconUUID:$iBeaconUUID rssi: $txPowerCalibratedRSSI major:$major minor:$minor length:$length companyId:0x${companyId.toString(16).uppercase()} type:$type")
-                }
-            }
-
-            if (!beaconSet.contains(beacon)) {
-                beaconSet.add(beacon)
-                Handler(Looper.getMainLooper()).post {
-                    beaconAdapter?.updateData(beaconSet.toList(), beaconTypePositionSelected)
-                }
-            }*/
-        }
-
-        override fun onScanFailed(errorCode: Int) {
-            Log.e("BEACON", errorCode.toString())
-        }
-    }
 
 
     @SuppressLint("MissingPermission")
@@ -337,11 +294,6 @@ actual class BleManager actual constructor() {
                         }
                     }
 
-                   /* // 🔥 UUIDs for service and characteristic
-                    val serviceUuid = UUID.fromString("EC7B0001-EDFF-4CCE-9CF8-3B175487D710")
-                    val characteristicUuid = UUID.fromString("EC7B0004-EDFF-4CCE-9CF8-3B175487D710")
-
-                    readCharacteristic(serviceUuid, characteristicUuid)*/
                 } else {
                     println("Failed to discover services, status: $status")
                 }
@@ -414,33 +366,7 @@ actual class BleManager actual constructor() {
 
     @SuppressLint("MissingPermission")
     actual fun readBleData(serviceId: String, characteristicUuid: String) {
-        val serviceUuid = UUID.fromString(serviceId)
-        val characteristicUuids = UUID.fromString(characteristicUuid)
-
-
-        println("BluetoothGatt Read method is called.")
-
-        val gatt = bluetoothGatt
-        if (gatt == null) {
-            println("BluetoothGatt is null, cannot read characteristic.")
-            return
-        }
-
-        val service = gatt.getService(serviceUuid)
-        if (service == null) {
-            println("Service with UUID $serviceUuid not found.")
-            return
-        }
-
-        val characteristic = service.getCharacteristic(characteristicUuids)
-        if (characteristic == null) {
-            println("Characteristic with UUID $characteristicUuids not found.")
-            return
-        }
-
-        val success = gatt.readCharacteristic(characteristic)
-        println("Read characteristic request sent: $success")
-
+        bleReadQueue.trySend(BleReadRequest(serviceId, characteristicUuid))
     }
 
     @SuppressLint("MissingPermission")
@@ -479,5 +405,37 @@ actual class BleManager actual constructor() {
     }
 
 
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
+    suspend fun readCharacteristic(serviceId: String, characteristicUuid: String){
+        val serviceUuid = UUID.fromString(serviceId)
+        val characteristicUuids = UUID.fromString(characteristicUuid)
 
+        val gatt = bluetoothGatt
+        if (gatt == null) {
+            println("BluetoothGatt is null, cannot read characteristic.")
+            return
+        }
+
+        val service = gatt.getService(serviceUuid) ?: run {
+            println("Service with UUID $serviceUuid not found.")
+            return
+        }
+
+        val characteristic = service.getCharacteristic(characteristicUuids) ?: run {
+            println("Characteristic with UUID $characteristicUuids not found.")
+            return
+        }
+
+        if (gatt.readCharacteristic(characteristic)) {
+            println("Read characteristic request sent successfully.")
+            waitForReadCompletion(characteristicUuids.toString())
+        } else {
+            println("Failed to initiate read request.")
+        }
+    }
+
+    private suspend fun waitForReadCompletion(expectedUuid: String) {
+        readDataResult.first { it?.first == expectedUuid }
+        delay(500) // Ensure slight delay to prevent rapid consecutive reads
+    }
 }
